@@ -27,3 +27,13 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True # Dulu orm_mode = True, penting untuk membaca data dari SQLAlchemy
+
+# ==========================
+# SCHEMAS UNTUK AUTENTIKASI (LOGIN)
+# ==========================
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
