@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ag-purple: #7C2889;
+  --color-ag-yellow: #FDE021;
+}
