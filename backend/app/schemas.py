@@ -1,12 +1,10 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 # ==========================
 # SCHEMAS UNTUK USER (JEMAAT)
 # ==========================
-
-# 1. Skema dasar yang memuat field umum
 class UserBase(BaseModel):
     fullname: str
     username: str
@@ -14,19 +12,17 @@ class UserBase(BaseModel):
     status: Optional[str] = None
     talents: Optional[str] = None
 
-# 2. Skema saat registrasi (butuh password)
 class UserCreate(UserBase):
     password: str 
 
-# 3. Skema respon data user (Tanpa password!)
 class UserResponse(UserBase):
     id: int
     qr_code_data: Optional[str] = None
-    is_admin: bool
+    is_admin: bool  # <--- Ini kunci untuk memunculkan tombol di Vue
     created_at: datetime
 
     class Config:
-        from_attributes = True # Dulu orm_mode = True, penting untuk membaca data dari SQLAlchemy
+        from_attributes = True
 
 # ==========================
 # SCHEMAS UNTUK AUTENTIKASI (LOGIN)
@@ -37,3 +33,37 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+# ==========================
+# SCHEMAS UNTUK ABSENSI
+# ==========================
+class AttendanceBase(BaseModel):
+    pass
+
+class AttendanceCreate(AttendanceBase):
+    qr_code_data: str
+
+class AttendanceResponse(AttendanceBase):
+    id: int
+    user_id: int
+    scan_time: datetime
+
+    class Config:
+        from_attributes = True
+
+# Cetakan untuk mengambil nama dan status jemaat di Dashboard
+class UserForAttendance(BaseModel):
+    fullname: str
+    status: str
+    
+    class Config:
+        from_attributes = True
+
+# Cetakan gabungan: Data Absen + Data Jemaat
+class AttendanceListResponse(BaseModel):
+    id: int
+    scan_time: datetime
+    owner: UserForAttendance 
+
+    class Config:
+        from_attributes = True
