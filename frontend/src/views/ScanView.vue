@@ -1,28 +1,52 @@
 <template>
-  <div class="min-h-screen bg-gray-100 py-10 px-4 flex flex-col items-center">
-    <div class="w-full max-w-md">
-      <div class="bg-ag-purple p-4 rounded-t-2xl text-center text-white shadow-md">
-        <h1 class="text-xl font-bold">Scanner Absensi</h1>
-        <p class="text-ag-yellow text-xs">Arahkan kamera ke QR Jemaat</p>
+  <div class="min-h-screen bg-[#0A0A0A] flex flex-col items-center py-12 px-4 relative overflow-hidden">
+    
+    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-ag-purple rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-ag-yellow rounded-full mix-blend-screen filter blur-[150px] opacity-10"></div>
+
+    <div class="w-full max-w-md relative z-10 flex flex-col items-center">
+      
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-ag-purple tracking-tight mb-2">
+          Scanner Absensi
+        </h1>
+        <p class="text-gray-400 text-sm font-medium flex items-center justify-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-ag-yellow animate-pulse"></span>
+          Menunggu pindaian QR Jemaat
+        </p>
       </div>
       
-      <div class="bg-white p-6 rounded-b-2xl shadow-xl">
-        <div id="reader" class="w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-300"></div>
+      <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col items-center">
         
-        <div v-if="successMessage" class="mt-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-center shadow-sm transition-all">
-          <p class="font-bold text-lg mb-1">✅ Berhasil!</p>
-          <p class="text-sm">{{ successMessage }}</p>
-        </div>
+        <div id="reader" class="w-full overflow-hidden rounded-2xl relative bg-black/40 border-2 border-dashed border-white/20 transition-all duration-300 hover:border-ag-purple/50"></div>
         
-        <div v-if="errorMessage" class="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-center shadow-sm transition-all">
-          <p class="font-bold text-lg mb-1">❌ Gagal</p>
-          <p class="text-sm">{{ errorMessage }}</p>
-        </div>
+        <transition name="fade" mode="out-in">
+          <div v-if="successMessage" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.15)] flex flex-col items-center transform transition-all">
+            <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center mb-2 text-emerald-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <p class="font-bold text-white text-lg mb-0.5">Berhasil!</p>
+            <p class="text-emerald-400 text-sm font-medium">{{ successMessage }}</p>
+          </div>
+        </transition>
+        
+        <transition name="fade" mode="out-in">
+          <div v-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.15)] flex flex-col items-center transform transition-all">
+            <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center mb-2 text-red-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </div>
+            <p class="font-bold text-white text-lg mb-0.5">Akses Ditolak</p>
+            <p class="text-red-400 text-sm font-medium">{{ errorMessage }}</p>
+          </div>
+        </transition>
+
       </div>
       
-      <button @click="goBack" class="mt-8 w-full text-center text-gray-500 hover:text-ag-purple font-medium underline transition-colors">
-        Kembali ke Profil
+      <button @click="goBack" class="group mt-10 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm flex items-center gap-2">
+        <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        <span class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">Kembali ke Profil</span>
       </button>
+
     </div>
   </div>
 </template>
@@ -39,18 +63,15 @@ const errorMessage = ref('')
 let html5QrcodeScanner = null
 
 onMounted(() => {
-  // 1. Konfigurasi Kamera (Kotak Scanner)
   html5QrcodeScanner = new Html5QrcodeScanner(
     "reader",
     { fps: 10, qrbox: { width: 250, height: 250 } },
     /* verbose= */ false
   )
   
-  // 2. Nyalakan Scanner
   html5QrcodeScanner.render(onScanSuccess, onScanFailure)
 })
 
-// Matikan kamera jika user pindah ke halaman lain
 onUnmounted(() => {
   if (html5QrcodeScanner) {
     html5QrcodeScanner.clear().catch(error => {
@@ -59,32 +80,26 @@ onUnmounted(() => {
   }
 })
 
-// Fungsi ini berjalan otomatis saat Kamera melihat sebuah QR Code
 const onScanSuccess = async (decodedText) => {
-  // Hentikan kamera sementara agar tidak mengirim data berkali-kali
   html5QrcodeScanner.pause(true)
   successMessage.value = ''
   errorMessage.value = ''
 
   try {
-    // Tembak data QR ke API FastAPI backend Anda
     const response = await axios.post('http://127.0.0.1:8000/scan', {
       qr_code_data: decodedText
     })
     
-    // Tampilkan pesan sukses dengan jam absen
-    const jamAbsen = new Date(response.data.scan_time).toLocaleTimeString('id-ID')
-    successMessage.value = `Kehadiran tercatat pada jam ${jamAbsen}`
+    const jamAbsen = new Date(response.data.scan_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    successMessage.value = `Tercatat pada jam ${jamAbsen}`
     
   } catch (error) {
-    // Jika API mengembalikan error (misal QR palsu)
     if (error.response && error.response.status === 404) {
       errorMessage.value = 'QR Code tidak terdaftar di sistem!'
     } else {
-      errorMessage.value = 'Terjadi kesalahan pada server.'
+      errorMessage.value = 'Terjadi kesalahan jaringan atau server.'
     }
   } finally {
-    // Apapun hasilnya, nyalakan kamera lagi setelah 3 detik
     setTimeout(() => {
       successMessage.value = ''
       errorMessage.value = ''
@@ -94,7 +109,7 @@ const onScanSuccess = async (decodedText) => {
 }
 
 const onScanFailure = (error) => {
-  // Diabaikan: Kamera terus-terusan membaca frame meskipun tidak ada QR
+  // Diabaikan
 }
 
 const goBack = () => {
@@ -103,20 +118,78 @@ const goBack = () => {
 </script>
 
 <style>
-/* Memperbaiki tampilan tombol bawaan dari library html5-qrcode */
+/* =======================================================
+   CSS AJAIB: MENGUBAH TAMPILAN BAWAAN LIBRARY HTML5-QRCODE
+   AGAR COCOK DENGAN TEMA DARK MODE & GLASSMORPHISM
+   ======================================================= */
+
+/* Menghilangkan border bawaan dan merapikan kontainer video */
+#reader {
+  border: none !important;
+  padding: 1rem !important;
+}
+
+#reader video {
+  border-radius: 1rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Merapikan teks keterangan dari library */
+#reader__dashboard_section_csr span {
+  color: #9CA3AF !important; /* text-gray-400 */
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.875rem !important;
+}
+
+/* Mewarnai link 'Request Camera Permissions' */
+#reader__dashboard_section_csr a {
+  color: #FDE021 !important;
+  text-decoration: none !important;
+  font-weight: bold !important;
+}
+
+/* Mengubah Tombol Start / Stop / Permission bawaan library */
 #html5-qrcode-button-camera-permission,
 #html5-qrcode-button-camera-start,
 #html5-qrcode-button-camera-stop {
-  background-color: #FDE021;
-  color: #7C2889;
-  font-weight: bold;
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  margin: 10px 5px;
+  background: linear-gradient(to right, #FDE021, #e5c910) !important;
+  color: #111827 !important; /* text-gray-900 */
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.875rem !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 0.75rem !important; /* rounded-xl */
+  border: none !important;
+  cursor: pointer !important;
+  margin: 15px 5px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 0 20px rgba(253, 224, 33, 0.3) !important;
 }
-#reader__dashboard_section_csr span {
-  color: red !important;
+
+#html5-qrcode-button-camera-permission:hover,
+#html5-qrcode-button-camera-start:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Khusus tombol Stop berwarna merah bata */
+#html5-qrcode-button-camera-stop {
+  background: linear-gradient(to right, #EF4444, #DC2626) !important;
+  color: white !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3) !important;
+}
+
+#html5-qrcode-button-camera-stop:hover {
+  transform: scale(1.05) !important;
+}
+
+/* Transisi Halus untuk Notifikasi */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
