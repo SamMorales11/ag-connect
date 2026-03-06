@@ -26,6 +26,25 @@
       </div>
 
       <div v-else>
+        <div v-if="birthdays.length > 0" class="mb-8 p-5 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-ag-yellow/10 border border-pink-500/30 rounded-3xl backdrop-blur-xl flex items-center gap-5 shadow-[0_0_40px_rgba(236,72,153,0.15)] relative overflow-hidden group">
+          <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+          
+          <div class="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center text-2xl animate-bounce shadow-[0_0_20px_rgba(236,72,153,0.4)]">
+            🎂
+          </div>
+          
+          <div class="relative z-10">
+            <h3 class="text-pink-400 font-extrabold text-lg flex items-center gap-2">
+              Ulang Tahun Hari Ini! <span class="text-xs px-2 py-0.5 bg-pink-500/20 rounded-full text-pink-300 border border-pink-500/30">{{ birthdays.length }} Orang</span>
+            </h3>
+            <p class="text-gray-300 text-sm mt-0.5">
+              Selamat ulang tahun untuk: 
+              <span class="font-bold text-white tracking-wide">
+                {{ birthdays.map(b => b.fullname).join(', ') }}
+              </span>
+            </p>
+          </div>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           

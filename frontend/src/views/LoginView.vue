@@ -53,7 +53,10 @@
           <span v-else>Masuk ke Sistem</span>
         </button>
       </form>
-      
+      <p class="mt-8 text-center text-sm text-gray-400">
+        Belum memiliki Kartu Jemaat? 
+        <button @click="$router.push('/register')" class="text-ag-purple hover:text-ag-yellow font-bold transition-colors">Daftar di sini</button>
+      </p>
     </div>
   </div>
 </template>

@@ -91,7 +91,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
 # ==========================
-# 1. ENDPOINT REGISTER
+# 1. ENDPOINT REGISTER (DIPERBARUI)
 # ==========================
 @app.post("/register", response_model=schemas.UserResponse)
 def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -109,6 +109,7 @@ def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
         whatsapp=user.whatsapp,
         status=user.status,
         talents=user.talents,
+        date_of_birth=user.date_of_birth, # [BARU] Simpan tanggal lahir
         qr_code_data=qr_data
     )
     
@@ -171,3 +172,15 @@ def get_all_attendances(db: Session = Depends(get_db)):
     # Ambil semua data kehadiran dari database, urutkan dari yang terbaru (descending)
     attendances = db.query(models.Attendance).order_by(models.Attendance.scan_time.desc()).all()
     return attendances
+# ==========================
+# [BARU] ENDPOINT CEK ULANG TAHUN HARI INI
+# ==========================
+@app.get("/birthdays", response_model=List[schemas.UserResponse])
+def get_birthdays(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+    # Mengambil format Bulan-Tanggal hari ini (Contoh: "-03-06" untuk 6 Maret)
+    today_str = datetime.now().strftime("-%m-%d")
+    
+    # Cari siapa saja yang tanggal lahirnya diakhiri dengan Bulan-Tanggal hari ini
+    birthday_users = [u for u in users if u.date_of_birth and u.date_of_birth.endswith(today_str)]
+    return birthday_users
