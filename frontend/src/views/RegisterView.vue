@@ -71,7 +71,7 @@
         </form>
 
         <p class="mt-8 text-center text-sm text-gray-400">
-          Admin? <button @click="$router.push('/')" class="text-ag-yellow font-bold hover:underline">Masuk ke Dashboard</button>
+          Admin? <button @click="$router.push('/login')" class="text-ag-yellow font-bold hover:underline">Masuk ke Dashboard</button>
         </p>
       </div>
 
@@ -96,7 +96,7 @@
           </div>
         </div>
 
-        <button @click="$router.push('/')" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300">
+        <button @click="$router.push('/login')" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300">
           Selesai & Tutup
         </button>
       </div>

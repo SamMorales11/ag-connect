@@ -26,7 +26,8 @@
       </div>
 
       <div v-else>
-        <div v-if="birthdays.length > 0" class="mb-8 p-5 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-ag-yellow/10 border border-pink-500/30 rounded-3xl backdrop-blur-xl flex items-center gap-5 shadow-[0_0_40px_rgba(236,72,153,0.15)] relative overflow-hidden group">
+        
+        <div v-if="birthdays && birthdays.length > 0" class="mb-8 p-5 bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-ag-yellow/10 border border-pink-500/30 rounded-3xl backdrop-blur-xl flex items-center gap-5 shadow-[0_0_40px_rgba(236,72,153,0.15)] relative overflow-hidden group">
           <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
           
           <div class="w-12 h-12 bg-pink-500/20 rounded-full flex items-center justify-center text-2xl animate-bounce shadow-[0_0_20px_rgba(236,72,153,0.4)]">
@@ -45,7 +46,7 @@
             </p>
           </div>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           
           <div class="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-lg relative overflow-hidden group hover:border-ag-yellow/50 transition-colors duration-500">
@@ -95,15 +96,12 @@
             <h2 class="text-lg font-bold text-white mb-6">Tren 7 Hari Terakhir</h2>
             
             <div class="flex-1 flex items-end justify-between gap-2 h-48 mt-auto pb-2 border-b border-white/10 relative">
-              
               <div v-for="bar in chartData" :key="bar.day" class="flex flex-col items-center w-full group">
                 <span class="text-[10px] text-gray-400 font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity">{{ bar.count }}</span>
-                
                 <div class="w-full max-w-[40px] bg-gradient-to-t from-ag-purple/20 to-ag-yellow rounded-t-sm transition-all duration-1000 ease-out relative overflow-hidden" 
                      :style="`height: ${bar.heightPercentage}%`">
                      <div class="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </div>
-                
                 <span class="text-[10px] text-gray-500 font-medium mt-3">{{ bar.day }}</span>
               </div>
               
@@ -175,9 +173,9 @@ import axios from 'axios'
 
 const router = useRouter()
 const attendances = ref([])
+const birthdays = ref([])
 const isLoading = ref(true)
 
-// Variabel untuk menyimpan Statistik Card
 const stats = ref({
   today: 0,
   total: 0,
@@ -185,11 +183,15 @@ const stats = ref({
   lastScanner: '-'
 })
 
-// Logika Pengambilan Data
 onMounted(async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:8000/attendances')
-    attendances.value = response.data
+    const [absenRes, ultahRes] = await Promise.all([
+      axios.get('http://127.0.0.1:8000/attendances'),
+      axios.get('http://127.0.0.1:8000/birthdays')
+    ])
+    
+    attendances.value = absenRes.data
+    birthdays.value = ultahRes.data
     calculateStats()
   } catch (error) {
     console.error("Gagal mengambil data", error)
@@ -198,41 +200,33 @@ onMounted(async () => {
   }
 })
 
-// Menghitung Angka untuk Kotak Statistik
 const calculateStats = () => {
   const data = attendances.value
-  if (data.length === 0) return
+  if (!data || data.length === 0) return
 
   stats.value.total = data.length
   
-  // Hitung data hari ini
   const todayDate = new Date().toLocaleDateString('id-ID')
   stats.value.today = data.filter(a => new Date(a.scan_time).toLocaleDateString('id-ID') === todayDate).length
   
-  // Data terakhir scan
-  const lastRecord = data[0] // Karena backend sudah merutkannya descending
-  stats.value.lastScanner = lastRecord.owner.fullname
-  stats.value.lastScanTime = new Date(lastRecord.scan_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const lastRecord = data[0]
+  if (lastRecord) {
+    stats.value.lastScanner = lastRecord.owner.fullname
+    stats.value.lastScanTime = new Date(lastRecord.scan_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  }
 }
 
-// ============================================
-// LOGIKA PEMBUATAN GRAFIK BATANG (CSS CUSTOM)
-// ============================================
 const chartData = computed(() => {
-  if (attendances.value.length === 0) return []
+  if (!attendances.value || attendances.value.length === 0) return []
 
-  // 1. Kelompokkan data berdasarkan tanggal
   const groupedData = {}
   attendances.value.forEach(absen => {
-    // Ambil nama hari (Sen, Sel, Rab, dll)
     const dayName = new Date(absen.scan_time).toLocaleDateString('id-ID', { weekday: 'short' })
     groupedData[dayName] = (groupedData[dayName] || 0) + 1
   })
 
-  // 2. Cari angka tertinggi untuk menghitung persentase tinggi grafik (Max 100%)
   const maxCount = Math.max(...Object.values(groupedData), 1)
 
-  // 3. Ubah objek menjadi array agar bisa di-loop di HTML
   const finalChart = Object.keys(groupedData).map(day => {
     return {
       day: day,
@@ -241,11 +235,9 @@ const chartData = computed(() => {
     }
   })
 
-  // Membatasi hanya 7 hari terakhir (atau sesuai ketersediaan data)
   return finalChart.slice(0, 7).reverse() 
 })
 
-// Fungsi merapikan format jam/tanggal di tabel
 const formatTime = (isoString) => {
   const date = new Date(isoString)
   return date.toLocaleString('id-ID', { 
