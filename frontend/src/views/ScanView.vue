@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#0A0A0A] flex flex-col items-center py-12 px-4 relative overflow-hidden">
+  <div class="min-h-screen bg-[#0A0A0A] flex flex-col items-center py-12 px-4 relative overflow-hidden font-sans">
     
     <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-ag-purple rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-ag-yellow rounded-full mix-blend-screen filter blur-[150px] opacity-10"></div>
@@ -11,17 +11,32 @@
           Scanner Absensi
         </h1>
         <p class="text-gray-400 text-sm font-medium flex items-center justify-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-ag-yellow animate-pulse"></span>
-          Menunggu pindaian QR Jemaat
+          <span class="w-2 h-2 rounded-full bg-ag-yellow animate-pulse" :class="{'bg-emerald-400': isProcessing}"></span>
+          {{ isProcessing ? 'Memproses data...' : 'Menunggu pindaian QR Jemaat' }}
         </p>
       </div>
       
       <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col items-center">
         
-        <div id="reader" class="w-full overflow-hidden rounded-2xl relative bg-black/40 border-2 border-dashed border-white/20 transition-all duration-300 hover:border-ag-purple/50"></div>
+        <div class="relative w-full overflow-hidden rounded-2xl bg-black/60 border-2 border-dashed border-white/20 transition-all duration-300"
+             :class="{'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]': successMessage, 'border-red-500/50': errorMessage}">
+          
+          <div id="reader" class="w-full h-[300px] flex items-center justify-center relative z-10"></div>
+
+          <div v-if="successMessage" class="absolute inset-0 bg-emerald-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
+        </div>
+
+        <button 
+          @click="toggleCamera" 
+          :disabled="isProcessing"
+          class="mt-6 flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 border border-gray-600 rounded-xl text-white font-bold text-sm transition-all duration-300 shadow-lg transform active:scale-95 disabled:opacity-50"
+        >
+          <svg class="w-5 h-5 text-ag-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          Ganti Kamera {{ isFrontCamera ? 'Belakang' : 'Depan' }}
+        </button>
         
         <transition name="fade" mode="out-in">
-          <div v-if="successMessage" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.15)] flex flex-col items-center transform transition-all">
+          <div v-if="successMessage" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.15)] flex flex-col items-center">
             <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center mb-2 text-emerald-400">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </div>
@@ -31,7 +46,7 @@
         </transition>
         
         <transition name="fade" mode="out-in">
-          <div v-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.15)] flex flex-col items-center transform transition-all">
+          <div v-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md shadow-[0_0_20px_rgba(239,68,68,0.15)] flex flex-col items-center">
             <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center mb-2 text-red-400">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </div>
@@ -42,9 +57,9 @@
 
       </div>
       
-      <button @click="goBack" class="group mt-10 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm flex items-center gap-2">
+      <button @click="goBack" class="group mt-8 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm flex items-center gap-2">
         <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        <span class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">Kembali ke Profil</span>
+        <span class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">Kembali ke Portal Admin</span>
       </button>
 
     </div>
@@ -54,34 +69,74 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Html5QrcodeScanner } from 'html5-qrcode'
+import { Html5Qrcode } from 'html5-qrcode'
 import axios from 'axios'
 
 const router = useRouter()
 const successMessage = ref('')
 const errorMessage = ref('')
-let html5QrcodeScanner = null
+const isProcessing = ref(false)
+const isFrontCamera = ref(false) // Default: Kamera Belakang (Environment)
+
+let html5QrCode = null
 
 onMounted(() => {
-  html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader",
-    { fps: 10, qrbox: { width: 250, height: 250 } },
-    /* verbose= */ false
-  )
-  
-  html5QrcodeScanner.render(onScanSuccess, onScanFailure)
+  // Inisialisasi Core Class (Bukan Scanner Wrapper)
+  html5QrCode = new Html5Qrcode("reader")
+  startCamera()
 })
 
-onUnmounted(() => {
-  if (html5QrcodeScanner) {
-    html5QrcodeScanner.clear().catch(error => {
-      console.error("Gagal mematikan kamera", error)
-    })
+onUnmounted(async () => {
+  if (html5QrCode && html5QrCode.isScanning) {
+    try {
+      await html5QrCode.stop()
+      html5QrCode.clear()
+    } catch (error) {
+      console.error("Gagal mematikan kamera saat keluar", error)
+    }
   }
 })
 
+// Fungsi untuk memulai kamera dengan mode yang dipilih (Depan/Belakang)
+const startCamera = async () => {
+  try {
+    const facingMode = isFrontCamera.value ? "user" : "environment"
+    await html5QrCode.start(
+      { facingMode: facingMode },
+      { 
+        fps: 10, 
+        qrbox: { width: 220, height: 220 },
+        aspectRatio: 1.0 
+      },
+      onScanSuccess,
+      onScanFailure
+    )
+  } catch (err) {
+    console.error("Error memulai kamera:", err)
+    errorMessage.value = "Kamera tidak terdeteksi atau izin ditolak."
+  }
+}
+
+// Fungsi Bolak-Balik Kamera
+const toggleCamera = async () => {
+  if (isProcessing.value) return // Jangan biarkan ganti kamera saat sedang loading API
+  
+  if (html5QrCode && html5QrCode.isScanning) {
+    try {
+      await html5QrCode.stop() // Matikan kamera saat ini
+      isFrontCamera.value = !isFrontCamera.value // Balik status kamera
+      await startCamera() // Nyalakan lagi
+    } catch (error) {
+      console.error("Gagal mengganti kamera", error)
+    }
+  }
+}
+
 const onScanSuccess = async (decodedText) => {
-  html5QrcodeScanner.pause(true)
+  // Mencegah scan berulang kali dalam 1 detik yang sama
+  if (isProcessing.value) return 
+  
+  isProcessing.value = true
   successMessage.value = ''
   errorMessage.value = ''
 
@@ -100,16 +155,17 @@ const onScanSuccess = async (decodedText) => {
       errorMessage.value = 'Terjadi kesalahan jaringan atau server.'
     }
   } finally {
+    // Tahan notifikasi selama 3 detik sebelum mengizinkan scan berikutnya
     setTimeout(() => {
       successMessage.value = ''
       errorMessage.value = ''
-      html5QrcodeScanner.resume()
+      isProcessing.value = false
     }, 3000)
   }
 }
 
 const onScanFailure = (error) => {
-  // Diabaikan
+  // Diabaikan agar tidak spam console saat kamera mencari QR
 }
 
 const goBack = () => {
@@ -118,68 +174,17 @@ const goBack = () => {
 </script>
 
 <style>
-/* =======================================================
-   CSS AJAIB: MENGUBAH TAMPILAN BAWAAN LIBRARY HTML5-QRCODE
-   AGAR COCOK DENGAN TEMA DARK MODE & GLASSMORPHISM
-   ======================================================= */
-
-/* Menghilangkan border bawaan dan merapikan kontainer video */
-#reader {
-  border: none !important;
-  padding: 1rem !important;
-}
-
+/* Reset & Styling untuk Core Library Html5Qrcode */
 #reader video {
   border-radius: 1rem !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-/* Merapikan teks keterangan dari library */
-#reader__dashboard_section_csr span {
-  color: #9CA3AF !important; /* text-gray-400 */
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 0.875rem !important;
-}
-
-/* Mewarnai link 'Request Camera Permissions' */
-#reader__dashboard_section_csr a {
-  color: #FDE021 !important;
-  text-decoration: none !important;
-  font-weight: bold !important;
-}
-
-/* Mengubah Tombol Start / Stop / Permission bawaan library */
-#html5-qrcode-button-camera-permission,
-#html5-qrcode-button-camera-start,
-#html5-qrcode-button-camera-stop {
-  background: linear-gradient(to right, #FDE021, #e5c910) !important;
-  color: #111827 !important; /* text-gray-900 */
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 800 !important;
-  font-size: 0.875rem !important;
-  padding: 0.75rem 1.5rem !important;
-  border-radius: 0.75rem !important; /* rounded-xl */
-  border: none !important;
-  cursor: pointer !important;
-  margin: 15px 5px !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 0 20px rgba(253, 224, 33, 0.3) !important;
-}
-
-#html5-qrcode-button-camera-permission:hover,
-#html5-qrcode-button-camera-start:hover {
-  transform: scale(1.05) !important;
-}
-
-/* Khusus tombol Stop berwarna merah bata */
-#html5-qrcode-button-camera-stop {
-  background: linear-gradient(to right, #EF4444, #DC2626) !important;
-  color: white !important;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3) !important;
-}
-
-#html5-qrcode-button-camera-stop:hover {
-  transform: scale(1.05) !important;
+/* Menyembunyikan elemen sisa bawaan library jika ada */
+#reader img {
+  display: none !important;
 }
 
 /* Transisi Halus untuk Notifikasi */

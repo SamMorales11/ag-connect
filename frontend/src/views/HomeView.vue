@@ -2,23 +2,26 @@
   <div class="min-h-screen bg-[#0A0A0A] font-sans overflow-x-hidden selection:bg-ag-purple selection:text-white flex flex-col">
     
     <header class="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-md border-b border-white/5 transition-all duration-300">
-      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative">
+        
         <div class="flex items-center gap-3 cursor-pointer" @click="router.push('/')">
           <img src="/src/assets/LOGO AG .png" alt="AG Logo" class="h-15 object-contain drop-shadow-[0_0_15px_rgba(124,40,137,0.5)]" />
         </div>
         
-        <nav class="hidden md:flex items-center gap-8 text-sm font-bold text-gray-300 tracking-wide">
-          <button @click="router.push('/')" class="text-white">Home</button>
-          <button @click="router.push('/register')" class="hover:text-ag-yellow transition-colors">Daftar Akun</button>
-          <button @click="router.push('/login')" class="hover:text-ag-purple transition-colors">Admin Login</button>
+        <nav class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10 text-sm font-bold text-gray-300 tracking-wide">
+          <button @click="router.push('/')" class="text-white hover:text-ag-yellow transition-colors">Home</button>
+          <button @click="scrollToFooter" class="hover:text-ag-purple transition-colors">Kontak</button>
         </nav>
 
-        <div class="flex items-center gap-4">
-          <button @click="router.push('/login')" class="hidden md:block text-sm font-bold text-white hover:text-ag-yellow transition">Masuk</button>
+        <div class="flex items-center gap-5">
+          <button @click="router.push('/login')" class="hidden md:block text-sm font-bold text-gray-300 hover:text-white transition-colors">
+            Admin Login
+          </button>
           <button @click="router.push('/register')" class="text-sm font-extrabold bg-gradient-to-r from-ag-purple to-[#5b1d66] text-white px-6 py-2.5 rounded-full hover:shadow-[0_0_20px_rgba(124,40,137,0.5)] transform hover:scale-105 transition-all">
             Gabung Sekarang
           </button>
         </div>
+
       </div>
     </header>
 
@@ -62,7 +65,7 @@
       </div>
     </main>
 
-    <footer class="relative w-full border-t border-white/5 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 pt-16 pb-8 mt-auto">
+    <footer id="footer-section" class="relative w-full border-t border-white/5 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 pt-16 pb-8 mt-auto">
       <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-ag-purple/50 to-transparent"></div>
       
       <div class="max-w-7xl mx-auto px-6">
@@ -122,6 +125,14 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+// Fungsi untuk menggulir layar otomatis ke bagian Footer (Kontak)
+const scrollToFooter = () => {
+  const footer = document.getElementById('footer-section')
+  if (footer) {
+    footer.scrollIntoView({ behavior: 'smooth' })
+  }
+}
 </script>
 
 <style scoped>
