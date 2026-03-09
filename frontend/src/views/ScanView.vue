@@ -57,9 +57,11 @@
 
       </div>
       
-      <button @click="goBack" class="group mt-8 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm flex items-center gap-2">
+      <button v-if="isUserLoaded" @click="goBack" :class="isAdmin ? 'hover:bg-ag-purple/20' : 'hover:bg-red-500/20 hover:border-red-500/30'" class="group mt-8 px-6 py-3 bg-white/5 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm flex items-center gap-2">
         <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        <span class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">Kembali ke Portal Admin</span>
+        <span class="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">
+          {{ isAdmin ? 'Kembali ke Portal Admin' : 'Selesai & Keluar ke Beranda' }}
+        </span>
       </button>
 
     </div>
@@ -76,12 +78,40 @@ const router = useRouter()
 const successMessage = ref('')
 const errorMessage = ref('')
 const isProcessing = ref(false)
-const isFrontCamera = ref(false) // Default: Kamera Belakang (Environment)
+const isFrontCamera = ref(false) 
+
+// Logika Hak Akses
+const isAdmin = ref(false)
+const isUserLoaded = ref(false)
 
 let html5QrCode = null
 
-onMounted(() => {
-  // Inisialisasi Core Class (Bukan Scanner Wrapper)
+onMounted(async () => {
+  // 1. Cek Token Login
+  const token = localStorage.getItem('access_token')
+  if (!token) {
+    router.push('/')
+    return
+  }
+
+  // 2. Verifikasi Peran (Role) pengguna ke Backend
+  try {
+    const response = await axios.get('http://127.0.0.1:8000/users/me', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    
+    // Simpan status apakah dia Admin atau bukan (Usher)
+    isAdmin.value = response.data.is_admin
+    isUserLoaded.value = true
+
+  } catch (error) {
+    console.error("Sesi tidak valid", error)
+    localStorage.removeItem('access_token')
+    router.push('/')
+    return
+  }
+
+  // 3. Jika lolos verifikasi, hidupkan Kamera
   html5QrCode = new Html5Qrcode("reader")
   startCamera()
 })
@@ -97,17 +127,12 @@ onUnmounted(async () => {
   }
 })
 
-// Fungsi untuk memulai kamera dengan mode yang dipilih (Depan/Belakang)
 const startCamera = async () => {
   try {
     const facingMode = isFrontCamera.value ? "user" : "environment"
     await html5QrCode.start(
       { facingMode: facingMode },
-      { 
-        fps: 10, 
-        qrbox: { width: 220, height: 220 },
-        aspectRatio: 1.0 
-      },
+      { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 },
       onScanSuccess,
       onScanFailure
     )
@@ -117,15 +142,14 @@ const startCamera = async () => {
   }
 }
 
-// Fungsi Bolak-Balik Kamera
 const toggleCamera = async () => {
-  if (isProcessing.value) return // Jangan biarkan ganti kamera saat sedang loading API
+  if (isProcessing.value) return 
   
   if (html5QrCode && html5QrCode.isScanning) {
     try {
-      await html5QrCode.stop() // Matikan kamera saat ini
-      isFrontCamera.value = !isFrontCamera.value // Balik status kamera
-      await startCamera() // Nyalakan lagi
+      await html5QrCode.stop() 
+      isFrontCamera.value = !isFrontCamera.value 
+      await startCamera() 
     } catch (error) {
       console.error("Gagal mengganti kamera", error)
     }
@@ -133,7 +157,6 @@ const toggleCamera = async () => {
 }
 
 const onScanSuccess = async (decodedText) => {
-  // Mencegah scan berulang kali dalam 1 detik yang sama
   if (isProcessing.value) return 
   
   isProcessing.value = true
@@ -155,7 +178,6 @@ const onScanSuccess = async (decodedText) => {
       errorMessage.value = 'Terjadi kesalahan jaringan atau server.'
     }
   } finally {
-    // Tahan notifikasi selama 3 detik sebelum mengizinkan scan berikutnya
     setTimeout(() => {
       successMessage.value = ''
       errorMessage.value = ''
@@ -164,30 +186,31 @@ const onScanSuccess = async (decodedText) => {
   }
 }
 
-const onScanFailure = (error) => {
-  // Diabaikan agar tidak spam console saat kamera mencari QR
-}
+const onScanFailure = (error) => {}
 
+// FUNGSI NAVIGASI CERDAS 
 const goBack = () => {
-  router.push('/profile')
+  if (isAdmin.value) {
+    // Jika Admin: Kembali ke Portal Command Center
+    router.push('/profile')
+  } else {
+    // Jika Usher: Hapus Token Keamanan (Logout) dan tendang ke Home
+    localStorage.removeItem('access_token')
+    router.push('/')
+  }
 }
 </script>
 
 <style>
-/* Reset & Styling untuk Core Library Html5Qrcode */
 #reader video {
   border-radius: 1rem !important;
   object-fit: cover !important;
   width: 100% !important;
   height: 100% !important;
 }
-
-/* Menyembunyikan elemen sisa bawaan library jika ada */
 #reader img {
   display: none !important;
 }
-
-/* Transisi Halus untuk Notifikasi */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s ease, transform 0.5s ease;
