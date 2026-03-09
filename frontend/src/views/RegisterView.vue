@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 relative overflow-x-hidden py-10">
+  <div class="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 relative overflow-x-hidden py-10 font-sans">
     <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-ag-purple rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse pointer-events-none"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-ag-yellow rounded-full mix-blend-screen filter blur-[150px] opacity-10 pointer-events-none"></div>
 
@@ -21,21 +21,20 @@
         </div>
 
         <form @submit.prevent="handleRegister" class="space-y-5">
-          
           <div>
             <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
-            <input v-model="form.fullname" type="text" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 focus:border-ag-purple text-white placeholder-gray-600 outline-none transition-all" placeholder="Misal: Samuel Christian">
+            <input v-model="form.fullname" type="text" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white placeholder-gray-600 outline-none transition-all" placeholder="Misal: Samuel Christian">
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tanggal Lahir</label>
-            <input v-model="form.date_of_birth" type="date" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 focus:border-ag-purple text-white outline-none transition-all appearance-none" style="color-scheme: dark;">
+            <input v-model="form.date_of_birth" type="date" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white outline-none transition-all appearance-none" style="color-scheme: dark;">
           </div>
 
           <template v-if="tab === 'jemaat'">
             <div>
               <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Status / Pekerjaan</label>
-              <select v-model="form.pekerjaan" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 focus:border-ag-purple text-white outline-none transition-all appearance-none">
+              <select v-model="form.pekerjaan" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white outline-none transition-all appearance-none">
                 <option value="Siswa" class="bg-gray-900">Siswa</option>
                 <option value="Mahasiswa" class="bg-gray-900">Mahasiswa</option>
                 <option value="Pekerja" class="bg-gray-900">Pekerja / Karyawan</option>
@@ -44,14 +43,14 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Username Sosmed / WA</label>
-              <input v-model="form.whatsapp" type="text" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 focus:border-ag-purple text-white placeholder-gray-600 outline-none transition-all" placeholder="@instagram atau 0812...">
+              <input v-model="form.whatsapp" type="text" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white placeholder-gray-600 outline-none transition-all" placeholder="@instagram atau 0812...">
             </div>
           </template>
 
           <template v-if="tab === 'pelayan'">
             <div>
               <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Bidang Pelayanan</label>
-              <select v-model="form.pelayanan" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 focus:border-ag-yellow text-white outline-none transition-all appearance-none">
+              <select v-model="form.pelayanan" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white outline-none transition-all appearance-none">
                 <option value="Praise and Worship" class="bg-gray-900">Praise and Worship</option>
                 <option value="Musik Pujian" class="bg-gray-900">Musik Pujian</option>
                 <option value="Usher / Greeter" class="bg-gray-900">Usher / Greeter</option>
@@ -60,7 +59,28 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp</label>
-              <input v-model="form.whatsapp" type="text" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 focus:border-ag-yellow text-white placeholder-gray-600 outline-none transition-all" placeholder="08123456789">
+              <input v-model="form.whatsapp" type="text" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white placeholder-gray-600 outline-none transition-all" placeholder="08123456789">
+            </div>
+
+            <div v-if="form.pelayanan === 'Usher / Greeter'" class="mt-4 p-5 bg-gradient-to-br from-ag-yellow/10 to-transparent border border-ag-yellow/30 rounded-2xl space-y-4 shadow-inner">
+              <p class="text-[11px] font-black text-ag-yellow uppercase tracking-widest flex items-center gap-2 mb-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+                Akses Scanner Usher
+              </p>
+              <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Buat Username Login</label>
+                <input v-model="form.username" type="text" required class="w-full px-4 py-3 bg-black/60 border border-gray-600 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white placeholder-gray-500 outline-none transition-all" placeholder="Misal: usher_samuel">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Password</label>
+                  <input v-model="form.password" type="password" required class="w-full px-4 py-3 bg-black/60 border border-gray-600 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white outline-none transition-all" placeholder="••••••••">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Konfirmasi</label>
+                  <input v-model="form.confirmPassword" type="password" required class="w-full px-4 py-3 bg-black/60 border border-gray-600 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white outline-none transition-all" placeholder="••••••••">
+                </div>
+              </div>
             </div>
           </template>
 
@@ -71,7 +91,7 @@
         </form>
 
         <p class="mt-8 text-center text-sm text-gray-400">
-          Admin? <button @click="$router.push('/login')" class="text-ag-yellow font-bold hover:underline">Masuk ke Dashboard</button>
+          Kembali ke <button @click="$router.push('/')" class="text-ag-yellow font-bold hover:underline">Beranda</button>
         </p>
       </div>
 
@@ -96,7 +116,7 @@
           </div>
         </div>
 
-        <button @click="$router.push('/login')" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300">
+        <button @click="$router.push('/')" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300">
           Selesai & Tutup
         </button>
       </div>
@@ -120,26 +140,42 @@ const registeredData = ref(null)
 const form = ref({
   fullname: '',
   whatsapp: '',
-  date_of_birth: '', // [BARU] Menampung tanggal
+  date_of_birth: '',
   pekerjaan: 'Siswa',
-  pelayanan: 'Praise and Worship'
+  pelayanan: 'Praise and Worship',
+  username: '', // Khusus Usher
+  password: '', // Khusus Usher
+  confirmPassword: '' // Khusus Usher
 })
 
 const handleRegister = async () => {
   isLoading.value = true
   errorMessage.value = ''
 
+  // Cek jika mendaftar sebagai Usher
+  const isUsher = tab.value === 'pelayan' && form.value.pelayanan === 'Usher / Greeter'
+
+  if (isUsher) {
+    if (form.value.password !== form.value.confirmPassword) {
+      errorMessage.value = 'Password dan Konfirmasi Password tidak cocok!'
+      isLoading.value = false
+      return
+    }
+  }
+
+  // Generate otomatis untuk non-Usher
   const safeName = form.value.fullname.toLowerCase().replace(/[^a-z0-9]/g, '')
   const randomNum = Math.floor(100 + Math.random() * 900)
-  const autoUsername = `${safeName}${randomNum}`
-  const autoPassword = 'default_ag_password_123!' 
+  
+  const finalUsername = isUsher ? form.value.username : `${safeName}${randomNum}`
+  const finalPassword = isUsher ? form.value.password : 'default_ag_password_123!'
 
   const payload = {
     fullname: form.value.fullname,
-    username: autoUsername,
-    password: autoPassword,
+    username: finalUsername,
+    password: finalPassword,
     whatsapp: form.value.whatsapp,
-    date_of_birth: form.value.date_of_birth, // [BARU] Kirim ke backend
+    date_of_birth: form.value.date_of_birth,
     status: tab.value === 'jemaat' ? form.value.pekerjaan : 'Pelayan Tuhan',
     talents: tab.value === 'pelayan' ? form.value.pelayanan : 'Jemaat Umum'
   }
@@ -149,7 +185,11 @@ const handleRegister = async () => {
     registeredData.value = response.data
     isRegistered.value = true
   } catch (error) {
-    errorMessage.value = 'Terjadi kesalahan pada server saat mendaftar.'
+    if (error.response && error.response.status === 400) {
+      errorMessage.value = 'Username tersebut sudah dipakai, silakan gunakan yang lain.'
+    } else {
+      errorMessage.value = 'Terjadi kesalahan pada server saat mendaftar.'
+    }
   } finally {
     isLoading.value = false
   }
@@ -162,9 +202,5 @@ const handleRegister = async () => {
   0% { opacity: 0; transform: translateY(20px) scale(0.95); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-/* Memperbaiki ikon kalender di Chrome agar terlihat jelas di dark mode */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
-}
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 </style>
