@@ -4,6 +4,15 @@
     <div class="fixed top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-600 rounded-full mix-blend-screen filter blur-[200px] opacity-10 pointer-events-none"></div>
     <div class="fixed bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-ag-purple rounded-full mix-blend-screen filter blur-[200px] opacity-10 pointer-events-none"></div>
 
+    <transition name="toast-fade">
+      <div v-if="toast.show" class="fixed top-6 right-6 z-[60] flex items-center gap-3 px-5 py-3.5 rounded-2xl shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-xl border"
+           :class="toast.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'">
+        <svg v-if="toast.type === 'success'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <span class="text-sm font-bold tracking-wide">{{ toast.message }}</span>
+      </div>
+    </transition>
+
     <div class="max-w-7xl mx-auto relative z-10 animate-fade-in-up">
       
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
@@ -110,11 +119,11 @@
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                     </button>
 
-                    <button v-if="isSuperAdmin && !user.is_admin" @click="promoteToAdmin(user.id, user.fullname)" class="p-2 bg-ag-yellow/10 text-ag-yellow hover:bg-ag-yellow hover:text-gray-900 rounded-lg transition-colors border border-ag-yellow/20 hover:shadow-[0_0_15px_rgba(253,224,33,0.5)]" title="Angkat Menjadi Admin">
+                    <button v-if="isSuperAdmin && !user.is_admin" @click="openConfirmModal('promote', user)" class="p-2 bg-ag-yellow/10 text-ag-yellow hover:bg-ag-yellow hover:text-gray-900 rounded-lg transition-colors border border-ag-yellow/20 hover:shadow-[0_0_15px_rgba(253,224,33,0.5)]" title="Angkat Menjadi Admin">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 7 6-7 6 7 3-7v12H3V6z"></path></svg>
                     </button>
 
-                    <button v-if="isSuperAdmin && user.username !== 'admin_ag'" @click="deleteUser(user.id, user.fullname)" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20" title="Hapus Data">
+                    <button v-if="isSuperAdmin && user.username !== 'admin_ag'" @click="openConfirmModal('delete', user)" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20" title="Hapus Data">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
 
@@ -126,6 +135,37 @@
         </div>
       </div>
 
+    </div>
+
+    <div v-if="confirmModal.show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in-up">
+      <div class="bg-[#111] border border-white/10 p-8 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.8)] w-full max-w-sm relative text-center">
+        
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 border shadow-lg"
+             :class="confirmModal.type === 'delete' ? 'bg-red-500/10 border-red-500/30 text-red-500 shadow-red-500/20' : 'bg-ag-yellow/10 border-ag-yellow/30 text-ag-yellow shadow-ag-yellow/20'">
+          <svg v-if="confirmModal.type === 'delete'" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <svg v-else class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 7 6-7 6 7 3-7v12H3V6z"></path></svg>
+        </div>
+
+        <h3 class="text-2xl font-black text-white mb-2">
+          {{ confirmModal.type === 'delete' ? 'Konfirmasi Hapus' : 'Promosi Akses' }}
+        </h3>
+        <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+          {{ confirmModal.type === 'delete' ? 'Anda yakin ingin menghapus data' : 'Anda yakin ingin mengangkat' }}
+          <strong class="text-white">"{{ confirmModal.userName }}"</strong>
+          {{ confirmModal.type === 'delete' ? 'secara permanen? Aksi ini tidak dapat dibatalkan.' : 'menjadi Admin Sistem?' }}
+        </p>
+        
+        <div class="flex gap-3">
+          <button @click="closeConfirmModal" :disabled="confirmModal.isLoading" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-all border border-white/10 disabled:opacity-50">
+            Batal
+          </button>
+          <button @click="executeAction" :disabled="confirmModal.isLoading" class="flex-1 px-4 py-3 font-bold rounded-xl transition-all shadow-lg flex items-center justify-center disabled:opacity-50"
+                  :class="confirmModal.type === 'delete' ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-ag-yellow hover:bg-[#e5c910] text-gray-900'">
+            <svg v-if="confirmModal.isLoading" class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span v-else>{{ confirmModal.type === 'delete' ? 'Ya, Hapus' : 'Ya, Promosikan' }}</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div v-if="selectedUserQR" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in-up">
@@ -162,7 +202,18 @@ const isLoading = ref(true)
 const searchQuery = ref('')
 const selectedUserQR = ref(null)
 
-// Variabel Penentu Superadmin
+// State untuk Toast Notification
+const toast = ref({ show: false, message: '', type: 'success' })
+
+// State untuk Modal Konfirmasi Custom
+const confirmModal = ref({
+  show: false,
+  type: '', // 'delete' atau 'promote'
+  userId: null,
+  userName: '',
+  isLoading: false
+})
+
 const currentUser = ref(null)
 const isSuperAdmin = computed(() => {
   return currentUser.value && currentUser.value.username === 'admin_ag'
@@ -175,17 +226,13 @@ onMounted(async () => {
     return
   }
   
-  // Ambil data user yang sedang login untuk mengecek apakah dia Superadmin ('admin_ag')
   try {
     const meRes = await axios.get('http://127.0.0.1:8000/users/me', {
       headers: { Authorization: `Bearer ${token}` }
     })
     currentUser.value = meRes.data
-    
-    // Jika lolos, ambil semua data jemaat
     await fetchUsers()
   } catch (error) {
-    console.error("Sesi tidak valid", error)
     localStorage.removeItem('access_token')
     router.push('/login')
   }
@@ -197,7 +244,7 @@ const fetchUsers = async () => {
     const response = await axios.get('http://127.0.0.1:8000/users')
     users.value = response.data
   } catch (error) {
-    console.error("Gagal mengambil data database", error)
+    showToast('Gagal memuat data dari server.', 'error')
   } finally {
     isLoading.value = false
   }
@@ -215,48 +262,66 @@ const filteredUsers = computed(() => {
 })
 
 const formatDate = (dateString) => {
-  if (!dateString) return 'Tidak ada data'
-  const date = new Date(dateString)
-  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-const openQRModal = (user) => {
-  selectedUserQR.value = user
+const openQRModal = (user) => { selectedUserQR.value = user }
+
+// Fungsi untuk memunculkan Toast Notification
+const showToast = (message, type = 'success') => {
+  toast.value = { show: true, message, type }
+  setTimeout(() => { toast.value.show = false }, 3000)
 }
 
-// FUNGSI BARU: MENGANGKAT ADMIN (HANYA SUPERADMIN)
-const promoteToAdmin = async (id, nama) => {
-  const isConfirmed = confirm(`👑 Promosi Akses: Apakah Anda yakin ingin mengangkat "${nama}" menjadi Admin sistem?`)
-  if (!isConfirmed) return
-
-  try {
-    await axios.put(`http://127.0.0.1:8000/users/${id}/promote`)
-    alert(`Sukses! ${nama} sekarang adalah Admin.`)
-    fetchUsers() // Refresh data untuk memunculkan badge 'Admin' di namanya
-  } catch (error) {
-    alert('Gagal mempromosikan user. Periksa koneksi server.')
+// Buka Custom Modal
+const openConfirmModal = (type, user) => {
+  confirmModal.value = {
+    show: true,
+    type: type,
+    userId: user.id,
+    userName: user.fullname,
+    isLoading: false
   }
 }
 
-// FUNGSI HAPUS (HANYA SUPERADMIN)
-const deleteUser = async (id, nama) => {
-  const isConfirmed = confirm(`PERINGATAN! Anda yakin ingin menghapus data "${nama}" secara permanen?`)
-  if (!isConfirmed) return
+// Tutup Custom Modal
+const closeConfirmModal = () => {
+  confirmModal.value.show = false
+}
+
+// Eksekusi API berdasarkan tipe Modal (Delete/Promote)
+const executeAction = async () => {
+  confirmModal.value.isLoading = true
+  const { type, userId, userName } = confirmModal.value
 
   try {
-    await axios.delete(`http://127.0.0.1:8000/users/${id}`)
-    alert('Data berhasil dihapus!')
-    fetchUsers() 
+    if (type === 'delete') {
+      await axios.delete(`http://127.0.0.1:8000/users/${userId}`)
+      showToast(`Data ${userName} berhasil dihapus.`, 'success')
+    } 
+    else if (type === 'promote') {
+      await axios.put(`http://127.0.0.1:8000/users/${userId}/promote`)
+      showToast(`${userName} berhasil diangkat menjadi Admin!`, 'success')
+    }
+    await fetchUsers() 
   } catch (error) {
-    alert('Gagal menghapus data. Periksa koneksi atau hak akses.')
+    showToast(`Gagal memproses permintaan Anda.`, 'error')
+  } finally {
+    closeConfirmModal()
   }
 }
 </script>
 
 <style scoped>
-.animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+.animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 @keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(20px) scale(0.98); }
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Animasi untuk Toast Notifikasi */
+.toast-fade-enter-active, .toast-fade-leave-active { transition: all 0.5s ease; }
+.toast-fade-enter-from { opacity: 0; transform: translateX(50px); }
+.toast-fade-leave-to { opacity: 0; transform: translateY(-20px); }
 </style>

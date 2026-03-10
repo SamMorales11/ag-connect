@@ -5,7 +5,7 @@
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative">
         
         <div class="flex items-center gap-3 cursor-pointer" @click="router.push('/')">
-          <img src="/src/assets/LOGO AG .png" alt="AG Logo" class="h-10 object-contain drop-shadow-[0_0_15px_rgba(124,40,137,0.5)]" />
+          <img src="/src/assets/LOGO AG .png" alt="AG Logo" class="h-15 object-contain drop-shadow-[0_0_15px_rgba(124,40,137,0.5)]" />
         </div>
         
         <nav class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10 text-sm font-bold text-gray-300 tracking-wide">
@@ -78,7 +78,6 @@
             <h4 class="text-white font-extrabold mb-5 uppercase tracking-widest text-xs">Hubungi Kami</h4>
             <ul class="space-y-3 text-sm font-medium text-gray-400">
               <li class="flex items-start gap-3"><svg class="w-5 h-5 text-ag-yellow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>Balikpapan, Kalimantan Timur, Indonesia</span></li>
-              <li class="flex items-center gap-3"><svg class="w-5 h-5 text-ag-purple shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><span>admin@arrowgeneration.org</span></li>
               <li class="flex items-center gap-3"><svg class="w-5 h-5 text-ag-yellow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg><span>@arrowgeneration</span></li>
             </ul>
           </div>
