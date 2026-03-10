@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
-from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.sql import func
 from .database import Base
 
 class User(Base):
@@ -11,21 +10,26 @@ class User(Base):
     fullname = Column(String, index=True)
     username = Column(String, unique=True, index=True)
     password_hash = Column(String)
-    whatsapp = Column(String)
-    status = Column(String)
-    talents = Column(String)
+    whatsapp = Column(String, nullable=True)
+    status = Column(String, nullable=True)
+    talents = Column(String, nullable=True)
+    date_of_birth = Column(String, nullable=True)
     qr_code_data = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
-    date_of_birth = Column(String, nullable=True) # [BARU] Format YYYY-MM-DD
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    attendances = relationship("Attendance", back_populates="owner")
+    # [BARU] Relasi balik ke tabel Attendance
+    # cascade="all, delete-orphan" artinya jika user dihapus, data absensinya juga ikut terhapus otomatis
+    attendances = relationship("Attendance", back_populates="user", cascade="all, delete-orphan")
+
 
 class Attendance(Base):
     __tablename__ = "attendances"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id")) 
+    user_id = Column(Integer, ForeignKey("users.id"))
     scan_time = Column(DateTime(timezone=True), server_default=func.now())
-    
-    owner = relationship("User", back_populates="attendances")
+    service_type = Column(String, default="AG")
+
+    # [BARU] Relasi ke tabel User agar FastAPI bisa memanggil log.user.fullname
+    user = relationship("User", back_populates="attendances")

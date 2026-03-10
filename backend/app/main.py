@@ -1,17 +1,24 @@
 from fastapi import FastAPI, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload # [BARU] Tambah joinedload
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel # [BARU] Tambah BaseModel
 import bcrypt
 import jwt
 from jwt.exceptions import InvalidTokenError
 import uuid
 from datetime import datetime, timedelta
-from typing import List # Pastikan ini ada di bagian atas (bisa ditaruh di bawah import uuid)
+from typing import List
 
-# [BARU] Import CORSMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import models, schemas, database
+
+# ==========================
+# [BARU] SCHEMA LOKAL (Mencegah error 'ScanRequest' not defined)
+# ==========================
+class ScanRequestData(BaseModel):
+    qr_code_data: str
+    service_type: str = "AG"
 
 # Perintah ajaib untuk otomatis membuat tabel
 models.Base.metadata.create_all(bind=database.engine)
@@ -19,7 +26,7 @@ models.Base.metadata.create_all(bind=database.engine)
 app = FastAPI(title="AG Connect API")
 
 # ==========================
-# [BARU] PENGATURAN CORS (Izinkan Vue Frontend)
+# PENGATURAN CORS (Izinkan Vue Frontend)
 # ==========================
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +46,6 @@ SECRET_KEY = "kunci_rahasia_ag_connect_sangat_aman_123!"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # Token berlaku 7 hari
 
-# Ini yang memunculkan tombol "Authorize" (Gembok) di Swagger UI
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -65,9 +71,6 @@ def get_db():
     finally:
         db.close()
 
-# ==========================
-# FUNGSI CEK USER SAAT INI (BERDASARKAN TOKEN)
-# ==========================
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -75,7 +78,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        # Buka isi token JWT
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
@@ -83,7 +85,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except InvalidTokenError:
         raise credentials_exception
         
-    # Cari user di database berdasarkan username di dalam token
     user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
         raise credentials_exception
@@ -91,7 +92,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
 # ==========================
-# 1. ENDPOINT REGISTER (DIPERBARUI)
+# 1. ENDPOINT REGISTER
 # ==========================
 @app.post("/register", response_model=schemas.UserResponse)
 def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -109,7 +110,7 @@ def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
         whatsapp=user.whatsapp,
         status=user.status,
         talents=user.talents,
-        date_of_birth=user.date_of_birth, # [BARU] Simpan tanggal lahir
+        date_of_birth=user.date_of_birth,
         qr_code_data=qr_data
     )
     
@@ -135,61 +136,61 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     return {"access_token": access_token, "token_type": "bearer"}
 
 # ==========================
-# 3. ENDPOINT PROFIL SAYA (RAHASIA/TERKUNCI)
+# 3. ENDPOINT PROFIL SAYA
 # ==========================
 @app.get("/users/me", response_model=schemas.UserResponse)
 def read_users_me(current_user: models.User = Depends(get_current_user)):
-    # Fungsi ini hanya bisa diakses jika jemaat membawa Token yang valid.
-    # Secara otomatis mengembalikan biodata user yang sedang login (termasuk qr_code_data).
     return current_user
+
 # ==========================
-# 4. [BARU] ENDPOINT SCAN QR ABSENSI
+# 4. ENDPOINT SCAN QR ABSENSI (SUDAH DIPERBAIKI)
 # ==========================
-@app.post("/scan", response_model=schemas.AttendanceResponse)
-def scan_attendance(scan_data: schemas.AttendanceCreate, db: Session = Depends(get_db)):
-    # 1. Cari jemaat berdasarkan teks QR Code yang di-scan
-    user = db.query(models.User).filter(models.User.qr_code_data == scan_data.qr_code_data).first()
-    
-    # 2. Jika QR Code palsu atau tidak ada di database
+@app.post("/scan")
+def scan_attendance(request: ScanRequestData, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.qr_code_data == request.qr_code_data).first()
     if not user:
-        raise HTTPException(status_code=404, detail="QR Code tidak valid atau jemaat tidak ditemukan")
+        raise HTTPException(status_code=404, detail="QR Code tidak valid")
+
+    # Catat absensi beserta tipe ibadahnya (AG / AG Lite)
+    new_attendance = models.Attendance(
+        user_id=user.id, 
+        service_type=request.service_type
+    )
     
-    # 3. Jika ketemu, buat catatan absensi baru
-    new_attendance = models.Attendance(user_id=user.id)
-    
-    # 4. Simpan ke database
     db.add(new_attendance)
     db.commit()
     db.refresh(new_attendance)
-    
-    # Kembalikan data waktu scan sebagai bukti sukses
-    return new_attendance
+
+    return {
+        "message": "Absensi berhasil dicatat", 
+        "scan_time": new_attendance.scan_time, 
+        "service_type": new_attendance.service_type
+    }
+
 # ==========================
-# 5. [BARU] ENDPOINT DASHBOARD ADMIN (LIHAT SEMUA ABSENSI)
+# 5. ENDPOINT DASHBOARD ADMIN (SUDAH DIPERBAIKI RELASINYA)
 # ==========================
-@app.get("/attendances", response_model=List[schemas.AttendanceListResponse])
-def get_all_attendances(db: Session = Depends(get_db)):
-    # Ambil semua data kehadiran dari database, urutkan dari yang terbaru (descending)
-    attendances = db.query(models.Attendance).order_by(models.Attendance.scan_time.desc()).all()
-    return attendances
+@app.get("/attendance/logs")
+def get_attendance_logs(db: Session = Depends(get_db)):
+    # Mengambil absensi dan me-load data relasi User (nama, status)
+    logs = db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
+    return logs
+
 # ==========================
-# [BARU] ENDPOINT CEK ULANG TAHUN HARI INI
+# ENDPOINT CEK ULANG TAHUN HARI INI
 # ==========================
 @app.get("/birthdays", response_model=List[schemas.UserResponse])
 def get_birthdays(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
-    # Mengambil format Bulan-Tanggal hari ini (Contoh: "-03-06" untuk 6 Maret)
     today_str = datetime.now().strftime("-%m-%d")
-    
-    # Cari siapa saja yang tanggal lahirnya diakhiri dengan Bulan-Tanggal hari ini
     birthday_users = [u for u in users if u.date_of_birth and u.date_of_birth.endswith(today_str)]
     return birthday_users
+
 # ==========================
-# [BARU] ENDPOINT MANAJEMEN JEMAAT (ADMIN ONLY)
+# ENDPOINT MANAJEMEN JEMAAT (ADMIN ONLY)
 # ==========================
 @app.get("/users", response_model=List[schemas.UserResponse])
 def get_all_users(db: Session = Depends(get_db)):
-    # Mengambil seluruh data user dari database (terbaru di atas)
     users = db.query(models.User).order_by(models.User.created_at.desc()).all()
     return users
 
@@ -201,8 +202,9 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(db_user)
     db.commit()
     return {"message": "Data berhasil dihapus"}
+
 # ==========================
-# [BARU] ENDPOINT PROMOSI JADI ADMIN (SUPERADMIN ONLY)
+# ENDPOINT PROMOSI JADI ADMIN (SUPERADMIN ONLY)
 # ==========================
 @app.put("/users/{user_id}/promote")
 def promote_to_admin(user_id: int, db: Session = Depends(get_db)):
@@ -210,7 +212,6 @@ def promote_to_admin(user_id: int, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=404, detail="User tidak ditemukan")
     
-    # Ubah statusnya menjadi Admin
     db_user.is_admin = True
     db.commit()
     

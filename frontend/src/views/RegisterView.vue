@@ -101,24 +101,34 @@
         </div>
         <h2 class="text-3xl font-extrabold text-white mb-2">Pendaftaran Berhasil!</h2>
         <p class="text-gray-400 text-sm mb-8 px-4">
-          Ini adalah Kartu Jemaat Anda. <strong class="text-ag-yellow">Silakan Screenshot</strong> gambar ini.
+          Ini adalah Kartu Jemaat Anda. Silakan unduh dan simpan di galeri HP Anda.
         </p>
 
-        <div class="flex flex-col items-center justify-center mb-10 relative">
+        <div class="flex flex-col items-center justify-center mb-8 relative">
           <div class="absolute inset-0 bg-gradient-to-r from-ag-purple/30 to-ag-yellow/30 blur-2xl rounded-full"></div>
-          <div class="relative p-5 bg-white rounded-2xl shadow-[0_0_50px_rgba(253,224,33,0.3)]">
-            <qrcode-vue :value="registeredData.qr_code_data" :size="220" level="M" />
+          
+          <div ref="qrContainer" class="relative p-5 bg-white rounded-2xl shadow-[0_0_50px_rgba(253,224,33,0.3)] border-4 border-white">
+            <qrcode-vue :value="registeredData.qr_code_data" :size="220" level="H" />
           </div>
+          
           <div class="mt-5 bg-black/40 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-md">
             <p class="text-xs text-gray-400 font-mono tracking-wider break-all text-center max-w-[250px]">
-              <span class="text-ag-yellow">{{ registeredData.fullname }}</span>
+              <span class="text-ag-yellow font-bold text-sm">{{ registeredData.fullname }}</span>
             </p>
           </div>
         </div>
 
-        <button @click="$router.push('/')" class="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-3.5 px-4 rounded-xl transition-all duration-300">
-          Selesai & Tutup
-        </button>
+        <div class="flex flex-col gap-3">
+          <button @click="downloadQRCode" class="w-full bg-gradient-to-r from-ag-yellow to-[#e5c910] text-gray-900 hover:shadow-[0_0_20px_rgba(253,224,33,0.4)] font-extrabold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Unduh Kartu (Simpan ke Galeri)
+          </button>
+
+          <button @click="$router.push('/')" class="w-full bg-white/5 hover:bg-white/10 border border-white/20 text-gray-300 font-bold py-3.5 px-4 rounded-xl transition-all duration-300">
+            Selesai & Tutup
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -137,22 +147,24 @@ const errorMessage = ref('')
 const isRegistered = ref(false)
 const registeredData = ref(null)
 
+// Referensi DOM untuk membungkus QR Code agar bisa di-download
+const qrContainer = ref(null)
+
 const form = ref({
   fullname: '',
   whatsapp: '',
   date_of_birth: '',
   pekerjaan: 'Siswa',
   pelayanan: 'Praise and Worship',
-  username: '', // Khusus Usher
-  password: '', // Khusus Usher
-  confirmPassword: '' // Khusus Usher
+  username: '', 
+  password: '', 
+  confirmPassword: '' 
 })
 
 const handleRegister = async () => {
   isLoading.value = true
   errorMessage.value = ''
 
-  // Cek jika mendaftar sebagai Usher
   const isUsher = tab.value === 'pelayan' && form.value.pelayanan === 'Usher / Greeter'
 
   if (isUsher) {
@@ -163,7 +175,6 @@ const handleRegister = async () => {
     }
   }
 
-  // Generate otomatis untuk non-Usher
   const safeName = form.value.fullname.toLowerCase().replace(/[^a-z0-9]/g, '')
   const randomNum = Math.floor(100 + Math.random() * 900)
   
@@ -192,6 +203,34 @@ const handleRegister = async () => {
     }
   } finally {
     isLoading.value = false
+  }
+}
+
+// FUNGSI BARU: MENGUNDUH QR CODE SEBAGAI GAMBAR
+const downloadQRCode = () => {
+  if (!qrContainer.value) return
+
+  // Cari elemen <canvas> yang dihasilkan oleh komponen <qrcode-vue>
+  const canvas = qrContainer.value.querySelector('canvas')
+  
+  if (canvas) {
+    // Ubah kanvas menjadi data URL gambar berformat PNG
+    const imageUrl = canvas.toDataURL('image/png')
+    
+    // Buat tag <a> sementara di balik layar
+    const downloadLink = document.createElement('a')
+    downloadLink.href = imageUrl
+    
+    // Bersihkan spasi dari nama user untuk dijadikan nama file (misal: Kartu_Samuel_Christian.png)
+    const safeFilename = registeredData.value.fullname.replace(/\s+/g, '_')
+    downloadLink.download = `Kartu_AG_${safeFilename}.png`
+    
+    // Simulasikan klik untuk memicu unduhan, lalu hapus tag <a> tersebut
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
+    document.body.removeChild(downloadLink)
+  } else {
+    alert("Gagal memuat gambar QR. Silakan screenshot layar ini.")
   }
 }
 </script>

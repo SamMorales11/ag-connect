@@ -8,7 +8,7 @@ class UserBase(BaseModel):
     whatsapp: Optional[str] = None
     status: Optional[str] = None
     talents: Optional[str] = None
-    date_of_birth: Optional[str] = None # [BARU] Menyimpan tanggal lahir
+    date_of_birth: Optional[str] = None # Menyimpan tanggal lahir
 
 class UserCreate(UserBase):
     password: str 
@@ -34,6 +34,7 @@ class AttendanceBase(BaseModel):
 
 class AttendanceCreate(AttendanceBase):
     qr_code_data: str
+    service_type: str = "AG"
 
 class AttendanceResponse(AttendanceBase):
     id: int
@@ -50,10 +51,14 @@ class UserForAttendance(BaseModel):
     class Config:
         from_attributes = True
 
+# ==========================================
+# [DIPERBAIKI] FORMAT DATA UNTUK DASHBOARD
+# ==========================================
 class AttendanceListResponse(BaseModel):
     id: int
     scan_time: datetime
-    owner: UserForAttendance 
+    service_type: Optional[str] = "AG" # [BARU] Menambahkan tipe ibadah
+    user: UserForAttendance              # [DIPERBAIKI] Diubah dari 'owner' menjadi 'user'
 
     class Config:
         from_attributes = True
