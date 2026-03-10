@@ -184,3 +184,34 @@ def get_birthdays(db: Session = Depends(get_db)):
     # Cari siapa saja yang tanggal lahirnya diakhiri dengan Bulan-Tanggal hari ini
     birthday_users = [u for u in users if u.date_of_birth and u.date_of_birth.endswith(today_str)]
     return birthday_users
+# ==========================
+# [BARU] ENDPOINT MANAJEMEN JEMAAT (ADMIN ONLY)
+# ==========================
+@app.get("/users", response_model=List[schemas.UserResponse])
+def get_all_users(db: Session = Depends(get_db)):
+    # Mengambil seluruh data user dari database (terbaru di atas)
+    users = db.query(models.User).order_by(models.User.created_at.desc()).all()
+    return users
+
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+    db.delete(db_user)
+    db.commit()
+    return {"message": "Data berhasil dihapus"}
+# ==========================
+# [BARU] ENDPOINT PROMOSI JADI ADMIN (SUPERADMIN ONLY)
+# ==========================
+@app.put("/users/{user_id}/promote")
+def promote_to_admin(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User tidak ditemukan")
+    
+    # Ubah statusnya menjadi Admin
+    db_user.is_admin = True
+    db.commit()
+    
+    return {"message": f"{db_user.fullname} berhasil diangkat menjadi Admin!"}

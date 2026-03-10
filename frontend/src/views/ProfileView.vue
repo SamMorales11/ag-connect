@@ -92,12 +92,14 @@
         </button>
 
         <div class="group relative bg-white/[0.02] backdrop-blur-md border border-white/5 p-6 rounded-3xl text-left overflow-hidden opacity-70 cursor-not-allowed">
-          <div class="absolute top-4 right-4 px-2.5 py-1 bg-white/10 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-widest">Segera Hadir</div>
-          <div class="w-12 h-12 bg-gray-800 rounded-2xl flex items-center justify-center mb-4 border border-gray-700">
-            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <button @click="router.push('/manage-users')" class="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl text-left hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 overflow-hidden shadow-lg">
+          <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/40 transition-colors duration-500"></div>
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(59,130,246,0.4)] transform group-hover:scale-110 transition-transform">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
           </div>
-          <h4 class="text-xl font-bold text-gray-400 mb-2">Manajemen Jemaat</h4>
-          <p class="text-sm text-gray-500 font-medium">Kelola database, edit profil, dan cari data pendaftaran seluruh jemaat.</p>
+          <h4 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Manajemen Jemaat</h4>
+          <p class="text-sm text-gray-400 font-medium">Kelola database, edit profil, dan cetak ulang QR seluruh jemaat.</p>
+        </button>
         </div>
 
         <div class="group relative bg-white/[0.02] backdrop-blur-md border border-white/5 p-6 rounded-3xl text-left overflow-hidden opacity-70 cursor-not-allowed">
