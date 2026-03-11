@@ -91,8 +91,7 @@
           <p class="text-sm text-gray-400 font-medium">Pantau grafik statistik, total kehadiran, dan log absensi secara real-time.</p>
         </button>
 
-        <div class="group relative bg-white/[0.02] backdrop-blur-md border border-white/5 p-6 rounded-3xl text-left overflow-hidden opacity-70 cursor-not-allowed">
-          <button @click="router.push('/manage-users')" class="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl text-left hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 overflow-hidden shadow-lg">
+        <button @click="router.push('/manage-users')" class="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl text-left hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300 overflow-hidden shadow-lg">
           <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/40 transition-colors duration-500"></div>
           <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(59,130,246,0.4)] transform group-hover:scale-110 transition-transform">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -100,16 +99,20 @@
           <h4 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Manajemen Jemaat</h4>
           <p class="text-sm text-gray-400 font-medium">Kelola database, edit profil, dan cetak ulang QR seluruh jemaat.</p>
         </button>
-        </div>
 
-        <div class="group relative bg-white/[0.02] backdrop-blur-md border border-white/5 p-6 rounded-3xl text-left overflow-hidden opacity-70 cursor-not-allowed">
-           <div class="absolute top-4 right-4 px-2.5 py-1 bg-white/10 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-widest">Segera Hadir</div>
-          <div class="w-12 h-12 bg-gray-800 rounded-2xl flex items-center justify-center mb-4 border border-gray-700">
-            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        <button @click="downloadReport" :disabled="isExporting" class="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl text-left hover:bg-white/10 hover:border-emerald-500/50 transition-all duration-300 overflow-hidden shadow-lg disabled:opacity-50">
+          <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl group-hover:bg-emerald-500/40 transition-colors duration-500"></div>
+          
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(16,185,129,0.4)] transform group-hover:scale-110 transition-transform">
+            <svg v-if="isExporting" class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <svg v-else class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           </div>
-          <h4 class="text-xl font-bold text-gray-400 mb-2">Export Laporan</h4>
-          <p class="text-sm text-gray-500 font-medium">Unduh laporan kehadiran mingguan atau bulanan dalam format Excel/CSV.</p>
-        </div>
+          
+          <h4 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+            {{ isExporting ? 'Memproses File...' : 'Export Laporan' }}
+          </h4>
+          <p class="text-sm text-gray-400 font-medium">Unduh laporan kehadiran seluruh jemaat dalam format Excel/CSV.</p>
+        </button>
 
       </div>
 
@@ -133,6 +136,9 @@ import QrcodeVue from 'qrcode.vue'
 const router = useRouter()
 const user = ref(null)
 const isLoading = ref(true)
+
+// [BARU] Variabel untuk menampung status loading saat Export
+const isExporting = ref(false)
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
@@ -165,9 +171,43 @@ const goToDashboard = () => {
   router.push('/dashboard')
 }
 
+// [BARU] Fungsi Cerdas untuk Download Laporan CSV
+const downloadReport = async () => {
+  isExporting.value = true
+  try {
+    const token = localStorage.getItem('access_token')
+    
+    // Panggil API Export (Pastikan endpoint /export/attendances di main.py menyala)
+    const response = await axios.get('http://127.0.0.1:8000/export/attendances', {
+      headers: { Authorization: `Bearer ${token}` },
+      responseType: 'blob' // Menerima file biner dari backend
+    })
+
+    // Membuat objek URL dari file yang diterima
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    
+    // Membuat tag <a> sementara untuk men-trigger download
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'Laporan_Kehadiran_AG.csv') 
+    
+    document.body.appendChild(link)
+    link.click() // Otomatis mengunduh
+    
+    // Membersihkan sisa elemen dari browser
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+
+  } catch (error) {
+    console.error("Gagal mengekspor laporan", error)
+    alert("Terjadi kesalahan jaringan atau hak akses ditolak saat mengunduh laporan.")
+  } finally {
+    isExporting.value = false
+  }
+}
+
 const logout = () => {
   localStorage.removeItem('access_token')
-  // Mengarahkan ke halaman Home ('/') setelah logout
   router.push('/')
 }
 </script>

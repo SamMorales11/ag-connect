@@ -1,21 +1,20 @@
-from fastapi import FastAPI, Depends, HTTPException, status
-from sqlalchemy.orm import Session, joinedload # [BARU] Tambah joinedload
+from fastapi import FastAPI, Depends, HTTPException, status, Response
+from sqlalchemy.orm import Session, joinedload
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel # [BARU] Tambah BaseModel
+from pydantic import BaseModel
 import bcrypt
 import jwt
 from jwt.exceptions import InvalidTokenError
 import uuid
 from datetime import datetime, timedelta
 from typing import List
+import csv
+from io import StringIO
 
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import models, schemas, database
 
-# ==========================
-# [BARU] SCHEMA LOKAL (Mencegah error 'ScanRequest' not defined)
-# ==========================
 class ScanRequestData(BaseModel):
     qr_code_data: str
     service_type: str = "AG"
@@ -26,14 +25,11 @@ models.Base.metadata.create_all(bind=database.engine)
 app = FastAPI(title="AG Connect API")
 
 # ==========================
-# PENGATURAN CORS (Izinkan Vue Frontend)
+# PENGATURAN CORS
 # ==========================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173", 
-        "http://127.0.0.1:5173"
-    ], 
+    allow_origins=["*"], # Mengizinkan semua origin untuk mencegah error block saat download file
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -44,7 +40,7 @@ app.add_middleware(
 # ==========================
 SECRET_KEY = "kunci_rahasia_ag_connect_sangat_aman_123!" 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # Token berlaku 7 hari
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
@@ -55,14 +51,12 @@ def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_password_hash(password: str) -> str:
     pwd_bytes = password.encode('utf-8')
     salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(pwd_bytes, salt)
-    return hashed_password.decode('utf-8')
+    return bcrypt.hashpw(pwd_bytes, salt).decode('utf-8')
 
 def get_db():
     db = database.SessionLocal()
@@ -74,7 +68,7 @@ def get_db():
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Token tidak valid atau sudah kadaluarsa",
+        detail="Token tidak valid",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -91,9 +85,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-# ==========================
-# 1. ENDPOINT REGISTER
-# ==========================
 @app.post("/register", response_model=schemas.UserResponse)
 def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
@@ -113,86 +104,55 @@ def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
         date_of_birth=user.date_of_birth,
         qr_code_data=qr_data
     )
-    
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return new_user
 
-# ==========================
-# 2. ENDPOINT LOGIN
-# ==========================
+
 @app.post("/login", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
     if not user or not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Username atau password salah",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Username atau password salah")
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
-# ==========================
-# 3. ENDPOINT PROFIL SAYA
-# ==========================
+
 @app.get("/users/me", response_model=schemas.UserResponse)
 def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
-# ==========================
-# 4. ENDPOINT SCAN QR ABSENSI (SUDAH DIPERBAIKI)
-# ==========================
+
 @app.post("/scan")
 def scan_attendance(request: ScanRequestData, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.qr_code_data == request.qr_code_data).first()
     if not user:
         raise HTTPException(status_code=404, detail="QR Code tidak valid")
-
-    # Catat absensi beserta tipe ibadahnya (AG / AG Lite)
-    new_attendance = models.Attendance(
-        user_id=user.id, 
-        service_type=request.service_type
-    )
-    
+    new_attendance = models.Attendance(user_id=user.id, service_type=request.service_type)
     db.add(new_attendance)
     db.commit()
     db.refresh(new_attendance)
+    return {"message": "Absensi dicatat", "scan_time": new_attendance.scan_time, "service_type": new_attendance.service_type}
 
-    return {
-        "message": "Absensi berhasil dicatat", 
-        "scan_time": new_attendance.scan_time, 
-        "service_type": new_attendance.service_type
-    }
 
-# ==========================
-# 5. ENDPOINT DASHBOARD ADMIN (SUDAH DIPERBAIKI RELASINYA)
-# ==========================
 @app.get("/attendance/logs")
 def get_attendance_logs(db: Session = Depends(get_db)):
-    # Mengambil absensi dan me-load data relasi User (nama, status)
     logs = db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
     return logs
 
-# ==========================
-# ENDPOINT CEK ULANG TAHUN HARI INI
-# ==========================
+
 @app.get("/birthdays", response_model=List[schemas.UserResponse])
 def get_birthdays(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     today_str = datetime.now().strftime("-%m-%d")
-    birthday_users = [u for u in users if u.date_of_birth and u.date_of_birth.endswith(today_str)]
-    return birthday_users
+    return [u for u in users if u.date_of_birth and u.date_of_birth.endswith(today_str)]
 
-# ==========================
-# ENDPOINT MANAJEMEN JEMAAT (ADMIN ONLY)
-# ==========================
+
 @app.get("/users", response_model=List[schemas.UserResponse])
 def get_all_users(db: Session = Depends(get_db)):
-    users = db.query(models.User).order_by(models.User.created_at.desc()).all()
-    return users
+    return db.query(models.User).order_by(models.User.created_at.desc()).all()
+
 
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
@@ -201,18 +161,51 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User tidak ditemukan")
     db.delete(db_user)
     db.commit()
-    return {"message": "Data berhasil dihapus"}
+    return {"message": "Data dihapus"}
 
-# ==========================
-# ENDPOINT PROMOSI JADI ADMIN (SUPERADMIN ONLY)
-# ==========================
+
 @app.put("/users/{user_id}/promote")
 def promote_to_admin(user_id: int, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User tidak ditemukan")
-    
     db_user.is_admin = True
     db.commit()
+    return {"message": f"{db_user.fullname} diangkat jadi Admin"}
+
+
+# ==========================
+# ENDPOINT EXPORT LAPORAN CSV
+# ==========================
+@app.get("/export/attendances")
+def export_attendances(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    logs = db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
     
-    return {"message": f"{db_user.fullname} berhasil diangkat menjadi Admin!"}
+    # Menulis file ke memori sebelum dikirim
+    output = StringIO()
+    
+    # [PERUBAHAN CARA 1]: Tambahkan BOM agar Excel membaca file dengan rapi
+    output.write('\ufeff')
+    
+    # [PERUBAHAN CARA 1]: Gunakan titik koma (;) sebagai delimiter
+    writer = csv.writer(output, delimiter=";")
+    
+    writer.writerow(["ID Absensi", "Waktu Hadir", "Nama Jemaat", "Status", "Bidang Pelayanan", "Tipe Ibadah"])
+    
+    for log in logs:
+        time_str = log.scan_time.strftime("%Y-%m-%d %H:%M:%S") if log.scan_time else "-"
+        writer.writerow([
+            log.id,
+            time_str,
+            log.user.fullname if log.user else "User Dihapus",
+            log.user.status if log.user else "-",
+            log.user.talents if log.user else "-",
+            log.service_type or "AG"
+        ])
+        
+    response = Response(content=output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=Laporan_Kehadiran_AG.csv"
+    
+    # Mengubah Content-Type agar Excel lebih mudah mengenali charset UTF-8
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    return response
