@@ -227,7 +227,7 @@ onMounted(async () => {
   }
   
   try {
-    const meRes = await axios.get('http://127.0.0.1:8000/users/me', {
+    const meRes = await axios.get('https://semskii1-ag-connect-api.hf.space/users/me', {
       headers: { Authorization: `Bearer ${token}` }
     })
     currentUser.value = meRes.data
@@ -241,7 +241,7 @@ onMounted(async () => {
 const fetchUsers = async () => {
   isLoading.value = true
   try {
-    const response = await axios.get('http://127.0.0.1:8000/users')
+    const response = await axios.get('https://semskii1-ag-connect-api.hf.space/users')
     users.value = response.data
   } catch (error) {
     showToast('Gagal memuat data dari server.', 'error')
@@ -297,11 +297,11 @@ const executeAction = async () => {
 
   try {
     if (type === 'delete') {
-      await axios.delete(`http://127.0.0.1:8000/users/${userId}`)
+      await axios.delete(`https://semskii1-ag-connect-api.hf.space/users/${userId}`)
       showToast(`Data ${userName} berhasil dihapus.`, 'success')
     } 
     else if (type === 'promote') {
-      await axios.put(`http://127.0.0.1:8000/users/${userId}/promote`)
+      await axios.put(`https://semskii1-ag-connect-api.hf.space/users/${userId}/promote`)
       showToast(`${userName} berhasil diangkat menjadi Admin!`, 'success')
     }
     await fetchUsers() 

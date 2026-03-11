@@ -101,7 +101,7 @@ onMounted(async () => {
     return
   }
   try {
-    const response = await axios.get('http://127.0.0.1:8000/users/me', {
+    const response = await axios.get('https://semskii1-ag-connect-api.hf.space/users/me', {
       headers: { Authorization: `Bearer ${token}` }
     })
     isAdmin.value = response.data.is_admin
@@ -158,7 +158,7 @@ const onScanSuccess = async (decodedText) => {
 
   try {
     // [BARU] Kirim qr_code_data DAN service_type ke API
-    const response = await axios.post('http://127.0.0.1:8000/scan', {
+    const response = await axios.post('https://semskii1-ag-connect-api.hf.space/scan', {
       qr_code_data: decodedText,
       service_type: selectedService.value
     })

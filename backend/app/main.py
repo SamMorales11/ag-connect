@@ -173,26 +173,44 @@ def promote_to_admin(user_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"{db_user.fullname} diangkat jadi Admin"}
 
-
 # ==========================
-# ENDPOINT EXPORT LAPORAN CSV
+# ENDPOINT EXPORT LAPORAN CSV (DIUPGRADE DENGAN FILTER)
 # ==========================
 @app.get("/export/attendances")
-def export_attendances(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def export_attendances(filter: str = "all", db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     logs = db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
     
+    # Memfilter data berdasarkan waktu yang direquest
+    filtered_logs = []
+    now = datetime.now()
+    
+    for log in logs:
+        if not log.scan_time:
+            continue
+            
+        # Hilangkan zona waktu agar aman saat dibandingkan
+        log_date = log.scan_time.replace(tzinfo=None)
+        
+        if filter == "today":
+            if log_date.date() == now.date():
+                filtered_logs.append(log)
+        elif filter == "week":
+            if log_date >= (now - timedelta(days=7)):
+                filtered_logs.append(log)
+        elif filter == "month":
+            if log_date.month == now.month and log_date.year == now.year:
+                filtered_logs.append(log)
+        else:
+            filtered_logs.append(log)
+
     # Menulis file ke memori sebelum dikirim
     output = StringIO()
-    
-    # [PERUBAHAN CARA 1]: Tambahkan BOM agar Excel membaca file dengan rapi
     output.write('\ufeff')
-    
-    # [PERUBAHAN CARA 1]: Gunakan titik koma (;) sebagai delimiter
     writer = csv.writer(output, delimiter=";")
     
     writer.writerow(["ID Absensi", "Waktu Hadir", "Nama Jemaat", "Status", "Bidang Pelayanan", "Tipe Ibadah"])
     
-    for log in logs:
+    for log in filtered_logs:
         time_str = log.scan_time.strftime("%Y-%m-%d %H:%M:%S") if log.scan_time else "-"
         writer.writerow([
             log.id,
@@ -204,8 +222,13 @@ def export_attendances(db: Session = Depends(get_db), current_user: models.User 
         ])
         
     response = Response(content=output.getvalue())
-    response.headers["Content-Disposition"] = "attachment; filename=Laporan_Kehadiran_AG.csv"
     
-    # Mengubah Content-Type agar Excel lebih mudah mengenali charset UTF-8
+    # Nama file dinamis mengikuti filter
+    suffix = "Semua"
+    if filter == "today": suffix = "Hari_Ini"
+    elif filter == "week": suffix = "7_Hari_Terakhir"
+    elif filter == "month": suffix = "Bulan_Ini"
+    
+    response.headers["Content-Disposition"] = f"attachment; filename=Laporan_Kehadiran_AG_{suffix}.csv"
     response.headers["Content-Type"] = "text/csv; charset=utf-8"
     return response

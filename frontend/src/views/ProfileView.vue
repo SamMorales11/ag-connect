@@ -100,16 +100,15 @@
           <p class="text-sm text-gray-400 font-medium">Kelola database, edit profil, dan cetak ulang QR seluruh jemaat.</p>
         </button>
 
-        <button @click="downloadReport" :disabled="isExporting" class="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl text-left hover:bg-white/10 hover:border-emerald-500/50 transition-all duration-300 overflow-hidden shadow-lg disabled:opacity-50">
+        <button @click="showExportModal = true" class="group relative bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl text-left hover:bg-white/10 hover:border-emerald-500/50 transition-all duration-300 overflow-hidden shadow-lg">
           <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl group-hover:bg-emerald-500/40 transition-colors duration-500"></div>
           
           <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(16,185,129,0.4)] transform group-hover:scale-110 transition-transform">
-            <svg v-if="isExporting" class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <svg v-else class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           </div>
           
           <h4 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
-            {{ isExporting ? 'Memproses File...' : 'Export Laporan' }}
+            Export Laporan
           </h4>
           <p class="text-sm text-gray-400 font-medium">Unduh laporan kehadiran seluruh jemaat dalam format Excel/CSV.</p>
         </button>
@@ -124,6 +123,52 @@
       </div>
 
     </div>
+
+    <div v-if="showExportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in-up">
+      <div class="bg-[#111] border border-white/10 p-8 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.8)] w-full max-w-sm relative text-center">
+        
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        </div>
+
+        <h3 class="text-2xl font-black text-white mb-2">Pilih Laporan</h3>
+        <p class="text-sm text-gray-400 mb-6">Tentukan rentang waktu data kehadiran yang ingin Anda unduh ke Excel.</p>
+        
+        <div class="space-y-3 mb-6">
+          <button @click="exportFilter = 'today'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'today' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+            <span class="font-bold text-sm">Hari Ini</span>
+            <svg v-if="exportFilter === 'today'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </button>
+          
+          <button @click="exportFilter = 'week'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'week' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+            <span class="font-bold text-sm">7 Hari Terakhir</span>
+            <svg v-if="exportFilter === 'week'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </button>
+          
+          <button @click="exportFilter = 'month'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'month' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+            <span class="font-bold text-sm">Bulan Ini</span>
+            <svg v-if="exportFilter === 'month'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </button>
+
+          <button @click="exportFilter = 'all'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'all' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+            <span class="font-bold text-sm">Semua Waktu</span>
+            <svg v-if="exportFilter === 'all'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          </button>
+        </div>
+
+        <div class="flex gap-3">
+          <button @click="showExportModal = false" :disabled="isExporting" class="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-all border border-white/10 disabled:opacity-50">
+            Batal
+          </button>
+          <button @click="downloadReport" :disabled="isExporting" class="flex-1 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center justify-center disabled:opacity-50">
+            <svg v-if="isExporting" class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span v-else>Unduh Sekarang</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -137,7 +182,9 @@ const router = useRouter()
 const user = ref(null)
 const isLoading = ref(true)
 
-// [BARU] Variabel untuk menampung status loading saat Export
+// [BARU] State untuk Modal Export
+const showExportModal = ref(false)
+const exportFilter = ref('today') // Default filter
 const isExporting = ref(false)
 
 onMounted(async () => {
@@ -148,7 +195,7 @@ onMounted(async () => {
   }
 
   try {
-    const response = await axios.get('http://127.0.0.1:8000/users/me', {
+    const response = await axios.get('https://semskii1-ag-connect-api.hf.space/users/me', {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -163,40 +210,40 @@ onMounted(async () => {
   }
 })
 
-const goToScan = () => {
-  router.push('/scan')
-}
+const goToScan = () => router.push('/scan')
+const goToDashboard = () => router.push('/dashboard')
 
-const goToDashboard = () => {
-  router.push('/dashboard')
-}
-
-// [BARU] Fungsi Cerdas untuk Download Laporan CSV
+// [DIPERBAIKI] Fungsi Download dengan Parameter Filter
 const downloadReport = async () => {
   isExporting.value = true
   try {
     const token = localStorage.getItem('access_token')
     
-    // Panggil API Export (Pastikan endpoint /export/attendances di main.py menyala)
-    const response = await axios.get('http://127.0.0.1:8000/export/attendances', {
+    // Menambahkan filter ke URL endpoint
+    const response = await axios.get(`https://semskii1-ag-connect-api.hf.space/export/attendances?filter=${exportFilter.value}`, {
       headers: { Authorization: `Bearer ${token}` },
-      responseType: 'blob' // Menerima file biner dari backend
+      responseType: 'blob' 
     })
 
-    // Membuat objek URL dari file yang diterima
     const url = window.URL.createObjectURL(new Blob([response.data]))
-    
-    // Membuat tag <a> sementara untuk men-trigger download
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', 'Laporan_Kehadiran_AG.csv') 
+    
+    // Membuat nama file yang sesuai dengan pilihan di Frontend
+    const suffix = exportFilter.value === 'today' ? 'Hari_Ini' : 
+                   exportFilter.value === 'week' ? '7_Hari_Terakhir' : 
+                   exportFilter.value === 'month' ? 'Bulan_Ini' : 'Semua'
+
+    link.setAttribute('download', `Laporan_Kehadiran_AG_${suffix}.csv`) 
     
     document.body.appendChild(link)
-    link.click() // Otomatis mengunduh
+    link.click() 
     
-    // Membersihkan sisa elemen dari browser
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
+    
+    // Tutup modal setelah sukses
+    showExportModal.value = false
 
   } catch (error) {
     console.error("Gagal mengekspor laporan", error)
@@ -214,13 +261,13 @@ const logout = () => {
 
 <style scoped>
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.98);
+    transform: translateY(20px) scale(0.95);
   }
   100% {
     opacity: 1;

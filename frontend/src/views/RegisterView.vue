@@ -192,7 +192,7 @@ const handleRegister = async () => {
   }
 
   try {
-    const response = await axios.post('http://127.0.0.1:8000/register', payload)
+    const response = await axios.post('https://semskii1-ag-connect-api.hf.space/register', payload)
     registeredData.value = response.data
     isRegistered.value = true
   } catch (error) {
