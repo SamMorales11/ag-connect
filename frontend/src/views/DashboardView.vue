@@ -28,102 +28,21 @@
       <div v-else>
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-white/10 pb-4">
-          
           <div class="flex flex-wrap gap-2">
-            <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg shadow-ag-purple/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent" :style="activeTab === 'AG' ? 'border-color: rgba(124,40,137,0.5)' : ''">
-              Ibadah AG ({{ agLogs.length }})
-            </button>
-            <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg shadow-ag-yellow/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent" :style="activeTab === 'AG Lite' ? 'border-color: rgba(253,224,33,0.5)' : ''">
-              Ibadah AG Lite ({{ agLiteLogs.length }})
-            </button>
-            <button @click="activeTab = 'Leaderboard'" :class="activeTab === 'Leaderboard' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent" :style="activeTab === 'Leaderboard' ? 'border-color: rgba(16,185,129,0.5)' : ''">
+            <button @click="activeTab = 'Leaderboard'" :class="activeTab === 'Leaderboard' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent">
               🏆 Top Leaderboard
             </button>
-          </div>
-
-          <div v-if="activeTab !== 'Leaderboard'" class="relative">
-            <button @click="isDropdownOpen = !isDropdownOpen" class="flex items-center gap-3 bg-black/40 px-5 py-2.5 rounded-xl border border-white/10 backdrop-blur-md hover:bg-white/5 transition-all outline-none shadow-lg">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-              <span class="text-sm font-bold text-white">{{ currentFilterName }}</span>
-              <svg class="w-4 h-4 text-gray-500 transition-transform duration-300" :class="{'rotate-180': isDropdownOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg shadow-ag-purple/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent">
+              Ibadah AG ({{ agLogs.length }})
             </button>
-
-            <div v-if="isDropdownOpen" @click="isDropdownOpen = false" class="fixed inset-0 z-40"></div>
-
-            <transition name="dropdown-fade">
-              <div v-if="isDropdownOpen" class="absolute right-0 mt-2 w-48 bg-[#111] border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] z-50 overflow-hidden py-1.5 backdrop-blur-xl">
-                <button v-for="option in filterOptions" :key="option.id" @click="selectFilter(option.id)" 
-                        class="w-full text-left px-4 py-3 text-sm font-semibold transition-colors flex items-center gap-3" 
-                        :class="timeFilter === option.id ? 'bg-ag-purple/10 text-ag-purple' : 'text-gray-300 hover:bg-white/5 hover:text-white'">
-                  <svg v-if="timeFilter === option.id" class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                  <div v-else class="w-4 h-4 shrink-0"></div> {{ option.name }}
-                </button>
-              </div>
-            </transition>
-          </div>
-        </div>
-
-        <div v-if="activeTab !== 'Leaderboard'">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden group">
-              <div class="absolute -right-4 -top-4 w-24 h-24 rounded-full blur-2xl opacity-20 transition-all duration-500" :class="activeTab === 'AG' ? 'bg-ag-purple group-hover:bg-fuchsia-500' : 'bg-ag-yellow group-hover:bg-yellow-300'"></div>
-              <h3 class="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2 flex items-center gap-2">
-                Total Hadir
-                <span class="text-[10px] bg-white/10 px-2 py-0.5 rounded text-gray-300">{{ filterLabel }}</span>
-              </h3>
-              <p class="text-5xl font-black" :class="activeTab === 'AG' ? 'text-ag-purple' : 'text-ag-yellow'">
-                {{ activeTab === 'AG' ? agLogs.length : agLiteLogs.length }}
-              </p>
-            </div>
-          </div>
-
-          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-lg overflow-hidden animate-fade-in-up">
-            <div class="p-6 border-b border-white/10 bg-black/40 flex justify-between items-center">
-              <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                Log Kehadiran: <span :class="activeTab === 'AG' ? 'text-ag-purple' : 'text-ag-yellow'">{{ activeTab }}</span>
-              </h3>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left whitespace-nowrap">
-                <thead>
-                  <tr class="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                    <th class="py-4 px-6 font-bold">Waktu Hadir</th>
-                    <th class="py-4 px-6 font-bold">Nama Jemaat</th>
-                    <th class="py-4 px-6 font-bold">Kategori</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                  <tr v-if="(activeTab === 'AG' ? agLogs : agLiteLogs).length === 0">
-                    <td colspan="3" class="py-12 text-center text-gray-500 text-sm">
-                      Tidak ada data absensi untuk <strong>{{ activeTab }}</strong> pada rentang waktu <strong>{{ currentFilterName }}</strong>.
-                    </td>
-                  </tr>
-                  <tr v-else v-for="log in (activeTab === 'AG' ? agLogs : agLiteLogs)" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
-                    <td class="py-4 px-6">
-                      <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-gray-300">
-                        {{ formatTime(log.scan_time) }}
-                      </span>
-                    </td>
-                    <td class="py-4 px-6">
-                      <div class="font-bold text-gray-200">{{ log.user?.fullname || 'User Dihapus' }}</div>
-                    </td>
-                    <td class="py-4 px-6">
-                      <span v-if="log.user" class="text-xs font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
-                            :class="log.user.status === 'Pelayan Tuhan' ? 'bg-ag-yellow/10 text-ag-yellow border-ag-yellow/20' : 'bg-ag-purple/10 text-ag-purple border-ag-purple/20'">
-                        {{ log.user.status }}
-                      </span>
-                      <span v-else class="text-xs font-bold px-2 py-0.5 rounded border bg-gray-500/10 text-gray-400 border-gray-500/20">UNKNOWN</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg shadow-ag-yellow/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent">
+              Ibadah AG Lite ({{ agLiteLogs.length }})
+            </button>
           </div>
         </div>
 
         <div v-if="activeTab === 'Leaderboard'" class="animate-fade-in-up">
-          
-          <div class="text-center mb-10">
+          <div class="text-center mb-10 mt-6">
             <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500 mb-2">Hall of Fame</h2>
             <p class="text-gray-400 text-sm">Jemaat paling aktif beribadah dan mengajak teman baru.</p>
           </div>
@@ -145,7 +64,6 @@
                     </td>
                   </tr>
                   <tr v-else v-for="(user, index) in topUsers" :key="user.id" class="hover:bg-white/[0.03] transition-colors group">
-                    
                     <td class="py-4 px-6 text-center">
                       <div v-if="index === 0" class="w-10 h-10 mx-auto bg-gradient-to-br from-yellow-300 to-yellow-600 text-gray-900 rounded-full flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(253,224,33,0.5)] transform scale-110">1</div>
                       <div v-else-if="index === 1" class="w-10 h-10 mx-auto bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 rounded-full flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(209,213,219,0.4)]">2</div>
@@ -154,7 +72,6 @@
                         {{ index + 1 }}
                       </div>
                     </td>
-
                     <td class="py-4 px-6">
                       <div class="flex items-center gap-4">
                         <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black shadow-inner relative"
@@ -170,14 +87,52 @@
                         </div>
                       </div>
                     </td>
-
                     <td class="py-4 px-6 text-right">
                       <div class="inline-flex items-center justify-end gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-xl border border-emerald-500/20">
                         <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         <span class="text-xl font-black text-emerald-400">{{ user.points }}</span>
                       </div>
                     </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
+        <div v-else class="animate-fade-in-up">
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-white/10 bg-black/40 flex justify-between items-center">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                Log Kehadiran: <span :class="activeTab === 'AG' ? 'text-ag-purple' : 'text-ag-yellow'">{{ activeTab }}</span>
+              </h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left whitespace-nowrap">
+                <thead>
+                  <tr class="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
+                    <th class="py-4 px-6 font-bold">Waktu Hadir</th>
+                    <th class="py-4 px-6 font-bold">Nama Jemaat</th>
+                    <th class="py-4 px-6 font-bold">Kategori</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  <tr v-if="(activeTab === 'AG' ? agLogs : agLiteLogs).length === 0">
+                    <td colspan="3" class="py-12 text-center text-gray-500 text-sm">Tidak ada data absensi.</td>
+                  </tr>
+                  <tr v-else v-for="log in (activeTab === 'AG' ? agLogs : agLiteLogs)" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
+                    <td class="py-4 px-6">
+                      <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-gray-300">
+                        {{ new Date(log.scan_time).toLocaleString('id-ID') }}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 font-bold text-gray-200">{{ log.user?.fullname || 'User Dihapus' }}</td>
+                    <td class="py-4 px-6">
+                      <span v-if="log.user" class="text-xs font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
+                            :class="log.user.status === 'Pelayan Tuhan' ? 'bg-ag-yellow/10 text-ag-yellow border-ag-yellow/20' : 'bg-ag-purple/10 text-ag-purple border-ag-purple/20'">
+                        {{ log.user.status }}
+                      </span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -198,29 +153,10 @@ import axios from 'axios'
 const router = useRouter()
 const isLoading = ref(true)
 const allLogs = ref([])
-const allUsers = ref([]) // [BARU] Menyimpan data jemaat untuk leaderboard
+const allUsers = ref([])
 
-const activeTab = ref('AG')
-
-const timeFilter = ref('today') 
-const isDropdownOpen = ref(false)
-
-const filterOptions = [
-  { id: 'today', name: 'Hari Ini' },
-  { id: 'week', name: '7 Hari Terakhir' },
-  { id: 'month', name: 'Bulan Ini' },
-  { id: 'all', name: 'Semua Waktu' }
-]
-
-const currentFilterName = computed(() => {
-  const found = filterOptions.find(opt => opt.id === timeFilter.value)
-  return found ? found.name : 'Hari Ini'
-})
-
-const selectFilter = (id) => {
-  timeFilter.value = id
-  isDropdownOpen.value = false
-}
+// Jadikan Leaderboard sebagai tab utama yang langsung terbuka
+const activeTab = ref('Leaderboard') 
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
@@ -231,9 +167,9 @@ onMounted(async () => {
   await fetchData(token)
 })
 
-// [DIPERBAIKI] Fetch Logs dan Users sekaligus
 const fetchData = async (token) => {
   try {
+    // Meminta log absensi sekaligus daftar user beserta poinnya
     const [logsRes, usersRes] = await Promise.all([
       axios.get('https://semskii1-ag-connect-api.hf.space/attendance/logs', { headers: { Authorization: `Bearer ${token}` } }),
       axios.get('https://semskii1-ag-connect-api.hf.space/users', { headers: { Authorization: `Bearer ${token}` } })
@@ -241,7 +177,7 @@ const fetchData = async (token) => {
     
     allLogs.value = logsRes.data.map(log => ({
       ...log,
-      service_type: log.service_type || 'AG' 
+      service_type: log.service_type || 'AG'
     }))
 
     allUsers.value = usersRes.data
@@ -253,65 +189,16 @@ const fetchData = async (token) => {
   }
 }
 
-const filteredLogsByTime = computed(() => {
-  const now = new Date()
-  
-  return allLogs.value.filter(log => {
-    if (!log.scan_time) return false
-    const logDate = new Date(log.scan_time)
+const agLogs = computed(() => allLogs.value.filter(log => log.service_type === 'AG').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time)))
+const agLiteLogs = computed(() => allLogs.value.filter(log => log.service_type === 'AG Lite').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time)))
 
-    if (timeFilter.value === 'today') {
-      return logDate.toDateString() === now.toDateString()
-    } 
-    else if (timeFilter.value === 'week') {
-      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-      return logDate >= oneWeekAgo
-    } 
-    else if (timeFilter.value === 'month') {
-      return logDate.getMonth() === now.getMonth() && logDate.getFullYear() === now.getFullYear()
-    }
-    return true 
-  })
-})
-
-const agLogs = computed(() => {
-  return filteredLogsByTime.value.filter(log => log.service_type === 'AG').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time))
-})
-
-const agLiteLogs = computed(() => {
-  return filteredLogsByTime.value.filter(log => log.service_type === 'AG Lite').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time))
-})
-
-// [BARU] Logika mengurutkan Top 10 Jemaat berdasarkan Poin
+// Logika Leaderboard Gamifikasi
 const topUsers = computed(() => {
   return [...allUsers.value]
-    .filter(u => u.points > 0) // Hanya tampilkan yang punya poin
-    .sort((a, b) => b.points - a.points) // Urutkan dari tertinggi
-    .slice(0, 10) // Ambil 10 teratas
+    .sort((a, b) => b.points - a.points) // Urutkan dari poin tertinggi
+    .filter(u => u.points >= 0) // Tampilkan semua yang poinnya >= 0
+    .slice(0, 10) // Ambil 10 besar
 })
-
-const filterLabel = computed(() => {
-  switch(timeFilter.value) {
-    case 'today': return 'HARI INI'
-    case 'week': return '7 HARI TERAKHIR'
-    case 'month': return 'BULAN INI'
-    case 'all': return 'SEMUA WAKTU'
-    default: return ''
-  }
-})
-
-const formatTime = (dateStr) => {
-  if (!dateStr) return '-'
-  const d = new Date(dateStr)
-  const timePart = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-  
-  if (timeFilter.value === 'today') {
-    return timePart
-  } else {
-    const datePart = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-    return `${datePart} • ${timePart}`
-  }
-}
 </script>
 
 <style scoped>
@@ -319,13 +206,5 @@ const formatTime = (dateStr) => {
 @keyframes fadeInUp {
   0% { opacity: 0; transform: translateY(20px) scale(0.95); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.dropdown-fade-enter-active, .dropdown-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.dropdown-fade-enter-from, .dropdown-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
 }
 </style>

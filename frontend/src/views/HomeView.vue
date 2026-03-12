@@ -10,6 +10,7 @@
         
         <nav class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10 text-sm font-bold text-gray-300 tracking-wide">
           <button @click="$router.push('/')" class="text-white hover:text-ag-yellow transition-colors">Home</button>
+          <button @click="$router.push('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)] hover:scale-105">🏆 Leaderboard</button>
           <button @click="scrollToFooter" class="hover:text-ag-purple transition-colors">Kontak</button>
         </nav>
 

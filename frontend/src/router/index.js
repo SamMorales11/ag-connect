@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import PublicLeaderboardView from '../views/PublicLeaderboardView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,7 +11,8 @@ const router = createRouter({
     { path: '/profile', name: 'profile', component: () => import('../views/ProfileView.vue') },
     { path: '/scan', name: 'scan', component: () => import('../views/ScanView.vue') },
     { path: '/manage-users', name: 'manage-users', component: () => import('../views/ManageUsersView.vue') },
-    { path: '/dashboard', name: 'dashboard', component: () => import('../views/DashboardView.vue') }
+    { path: '/dashboard', name: 'dashboard', component: () => import('../views/DashboardView.vue') },
+    {path: '/leaderboard',name: 'leaderboard',component: PublicLeaderboardView}
   ]
 })
 
