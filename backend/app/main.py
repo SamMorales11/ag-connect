@@ -145,3 +145,22 @@ def get_users(db: Session = Depends(get_db)):
 @app.get("/attendance/logs")
 def get_attendance_logs(db: Session = Depends(get_db)):
     return db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
+
+# --- [BARU] TAMBAH POIN KUIS (KHUSUS ADMIN) ---
+@app.post("/users/{user_id}/add-quiz-points")
+def add_quiz_points(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    # 1. Pastikan yang menekan tombol adalah Admin
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat memberikan poin kuis.")
+    
+    # 2. Cari data jemaat yang akan diberi poin
+    target_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not target_user:
+        raise HTTPException(status_code=404, detail="Jemaat tidak ditemukan")
+    
+    # 3. Tambahkan 10 Poin!
+    target_user.points += 10
+    db.add(target_user)
+    db.commit()
+    
+    return {"message": f"🎉 10 Poin Kuis berhasil dikirim ke {target_user.fullname}!"}

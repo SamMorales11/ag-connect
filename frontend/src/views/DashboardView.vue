@@ -11,7 +11,7 @@
           <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-ag-purple tracking-tight mb-1">
             Dashboard <span class="text-white">Analitik</span>
           </h1>
-          <p class="text-gray-400 text-sm font-medium">Pantau kehadiran dan peringkat poin gamifikasi jemaat secara real-time.</p>
+          <p class="text-gray-400 text-sm font-medium">Pantau kehadiran dan berikan poin apresiasi jemaat.</p>
         </div>
         
         <button @click="$router.push('/profile')" class="group flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm">
@@ -42,56 +42,41 @@
         </div>
 
         <div v-if="activeTab === 'Leaderboard'" class="animate-fade-in-up">
-          <div class="text-center mb-10 mt-6">
-            <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500 mb-2">Hall of Fame</h2>
-            <p class="text-gray-400 text-sm">Jemaat paling aktif beribadah dan mengajak teman baru.</p>
-          </div>
-
-          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-lg overflow-hidden">
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-lg overflow-hidden mt-6">
             <div class="overflow-x-auto">
               <table class="w-full text-left whitespace-nowrap">
                 <thead>
                   <tr class="bg-black/40 text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
-                    <th class="py-5 px-6 font-bold text-center w-24">Peringkat</th>
+                    <th class="py-5 px-6 font-bold text-center w-24">Rank</th>
                     <th class="py-5 px-6 font-bold">Jemaat (Gamers)</th>
                     <th class="py-5 px-6 font-bold text-right">Total Poin</th>
+                    <th class="py-5 px-6 font-bold text-center w-36">Aksi Admin</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="topUsers.length === 0">
-                    <td colspan="3" class="py-16 text-center text-gray-500 text-sm font-medium">
-                      Belum ada jemaat yang memiliki poin gamifikasi saat ini.
-                    </td>
+                    <td colspan="4" class="py-16 text-center text-gray-500 text-sm font-medium">Belum ada data jemaat.</td>
                   </tr>
-                  <tr v-else v-for="(user, index) in topUsers" :key="user.id" class="hover:bg-white/[0.03] transition-colors group">
+                  <tr v-else v-for="(user, index) in topUsers" :key="user.id" class="hover:bg-white/[0.03] transition-colors">
                     <td class="py-4 px-6 text-center">
-                      <div v-if="index === 0" class="w-10 h-10 mx-auto bg-gradient-to-br from-yellow-300 to-yellow-600 text-gray-900 rounded-full flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(253,224,33,0.5)] transform scale-110">1</div>
-                      <div v-else-if="index === 1" class="w-10 h-10 mx-auto bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 rounded-full flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(209,213,219,0.4)]">2</div>
-                      <div v-else-if="index === 2" class="w-10 h-10 mx-auto bg-gradient-to-br from-amber-600 to-orange-800 text-white rounded-full flex items-center justify-center font-black text-lg shadow-[0_0_15px_rgba(217,119,6,0.4)]">3</div>
-                      <div v-else class="w-10 h-10 mx-auto bg-white/5 text-gray-400 border border-white/10 rounded-full flex items-center justify-center font-bold text-sm">
-                        {{ index + 1 }}
-                      </div>
+                      <div v-if="index === 0" class="w-8 h-8 mx-auto bg-yellow-500 text-gray-900 rounded-full flex items-center justify-center font-black shadow-lg">1</div>
+                      <div v-else-if="index === 1" class="w-8 h-8 mx-auto bg-gray-400 text-gray-900 rounded-full flex items-center justify-center font-black shadow-lg">2</div>
+                      <div v-else-if="index === 2" class="w-8 h-8 mx-auto bg-orange-600 text-white rounded-full flex items-center justify-center font-black shadow-lg">3</div>
+                      <div v-else class="text-gray-400 font-bold">{{ index + 1 }}</div>
                     </td>
                     <td class="py-4 px-6">
-                      <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black shadow-inner relative"
-                             :class="index === 0 ? 'bg-gradient-to-br from-yellow-300/20 to-yellow-600/20 border border-yellow-500/50 text-yellow-400' : 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 text-gray-300'">
-                          {{ user.fullname.charAt(0).toUpperCase() }}
-                          <div v-if="index === 0" class="absolute -top-2 -right-2 text-xl">👑</div>
-                        </div>
-                        <div>
-                          <div class="font-bold text-gray-200 text-base" :class="{'text-yellow-400': index === 0}">
-                            {{ user.fullname }}
-                          </div>
-                          <div class="text-[10px] text-gray-500 font-mono mt-0.5 uppercase tracking-wider">@{{ user.username }}</div>
-                        </div>
-                      </div>
+                      <div class="font-bold text-gray-200">{{ user.fullname }}</div>
+                      <div class="text-[10px] text-gray-500 font-mono mt-0.5">@{{ user.username }}</div>
                     </td>
                     <td class="py-4 px-6 text-right">
-                      <div class="inline-flex items-center justify-end gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-xl border border-emerald-500/20">
-                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        <span class="text-xl font-black text-emerald-400">{{ user.points }}</span>
+                      <div class="inline-flex items-center gap-1 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                        <span class="font-black text-emerald-400">{{ user.points }}</span>
                       </div>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                      <button @click="openConfirmModal(user)" class="bg-gradient-to-r from-ag-purple to-purple-600 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold py-2 px-3 rounded-lg shadow-lg transform hover:scale-105 transition-all flex items-center justify-center gap-1 mx-auto">
+                        🎁 +10 Kuis
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -101,16 +86,11 @@
         </div>
 
         <div v-else class="animate-fade-in-up">
-          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-lg overflow-hidden">
-            <div class="p-6 border-b border-white/10 bg-black/40 flex justify-between items-center">
-              <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                Log Kehadiran: <span :class="activeTab === 'AG' ? 'text-ag-purple' : 'text-ag-yellow'">{{ activeTab }}</span>
-              </h3>
-            </div>
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-lg overflow-hidden mt-6">
             <div class="overflow-x-auto">
               <table class="w-full text-left whitespace-nowrap">
                 <thead>
-                  <tr class="text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
+                  <tr class="bg-black/40 text-gray-500 text-xs uppercase tracking-widest border-b border-white/5">
                     <th class="py-4 px-6 font-bold">Waktu Hadir</th>
                     <th class="py-4 px-6 font-bold">Nama Jemaat</th>
                     <th class="py-4 px-6 font-bold">Kategori</th>
@@ -121,18 +101,9 @@
                     <td colspan="3" class="py-12 text-center text-gray-500 text-sm">Tidak ada data absensi.</td>
                   </tr>
                   <tr v-else v-for="log in (activeTab === 'AG' ? agLogs : agLiteLogs)" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
-                    <td class="py-4 px-6">
-                      <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-xs font-mono text-gray-300">
-                        {{ new Date(log.scan_time).toLocaleString('id-ID') }}
-                      </span>
-                    </td>
+                    <td class="py-4 px-6"><span class="text-xs font-mono text-gray-300">{{ new Date(log.scan_time).toLocaleString('id-ID') }}</span></td>
                     <td class="py-4 px-6 font-bold text-gray-200">{{ log.user?.fullname || 'User Dihapus' }}</td>
-                    <td class="py-4 px-6">
-                      <span v-if="log.user" class="text-xs font-bold px-2 py-0.5 rounded border uppercase tracking-wider"
-                            :class="log.user.status === 'Pelayan Tuhan' ? 'bg-ag-yellow/10 text-ag-yellow border-ag-yellow/20' : 'bg-ag-purple/10 text-ag-purple border-ag-purple/20'">
-                        {{ log.user.status }}
-                      </span>
-                    </td>
+                    <td class="py-4 px-6 text-xs text-gray-400">{{ log.user?.status || '-' }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -142,6 +113,38 @@
 
       </div>
     </div>
+
+    <transition name="fade">
+      <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="bg-[#111] border border-white/10 p-6 md:p-8 rounded-3xl max-w-sm w-full text-center shadow-[0_0_50px_rgba(168,85,247,0.15)] transform transition-all">
+          <div class="text-6xl mb-4 animate-bounce">🎁</div>
+          <h3 class="text-2xl font-black text-white mb-2">Berikan +10 Poin?</h3>
+          <p class="text-gray-400 text-sm mb-8 leading-relaxed">
+            Anda akan mengirimkan poin kuis kepada <br>
+            <span class="font-bold text-ag-yellow text-lg">{{ selectedUser?.fullname }}</span>
+          </p>
+          
+          <div class="flex gap-3">
+            <button @click="showConfirmModal = false" :disabled="isGivingPoints" class="flex-1 py-3 rounded-xl font-bold text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50">
+              Batal
+            </button>
+            <button @click="confirmGivePoints" :disabled="isGivingPoints" class="flex-1 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-ag-purple to-purple-600 hover:from-purple-500 hover:to-purple-400 transition-all shadow-[0_0_20px_rgba(168,85,247,0.4)] flex justify-center items-center disabled:opacity-50">
+              <span v-if="isGivingPoints" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span v-else>Ya, Berikan!</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <transition name="bounce">
+      <div v-if="showToast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl border backdrop-blur-xl flex items-center gap-3 shadow-2xl"
+           :class="toastType === 'success' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 'bg-red-500/20 border-red-500/50 text-red-400'">
+        <span class="text-2xl">{{ toastType === 'success' ? '🎉' : '❌' }}</span>
+        <span class="font-bold text-sm tracking-wide">{{ toastMessage }}</span>
+      </div>
+    </transition>
+
   </div>
 </template>
 
@@ -154,9 +157,17 @@ const router = useRouter()
 const isLoading = ref(true)
 const allLogs = ref([])
 const allUsers = ref([])
-
-// Jadikan Leaderboard sebagai tab utama yang langsung terbuka
 const activeTab = ref('Leaderboard') 
+
+// State Custom Modal & Notifikasi
+const showConfirmModal = ref(false)
+const selectedUser = ref(null)
+const isGivingPoints = ref(false)
+
+const showToast = ref(false)
+const toastMessage = ref('')
+const toastType = ref('success')
+let toastTimer = null
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
@@ -169,19 +180,12 @@ onMounted(async () => {
 
 const fetchData = async (token) => {
   try {
-    // Meminta log absensi sekaligus daftar user beserta poinnya
     const [logsRes, usersRes] = await Promise.all([
       axios.get('https://semskii1-ag-connect-api.hf.space/attendance/logs', { headers: { Authorization: `Bearer ${token}` } }),
       axios.get('https://semskii1-ag-connect-api.hf.space/users', { headers: { Authorization: `Bearer ${token}` } })
     ])
-    
-    allLogs.value = logsRes.data.map(log => ({
-      ...log,
-      service_type: log.service_type || 'AG'
-    }))
-
+    allLogs.value = logsRes.data.map(log => ({ ...log, service_type: log.service_type || 'AG' }))
     allUsers.value = usersRes.data
-
   } catch (error) {
     console.error("Gagal memuat data", error)
   } finally {
@@ -189,22 +193,93 @@ const fetchData = async (token) => {
   }
 }
 
+// 1. Membuka Custom Modal
+const openConfirmModal = (user) => {
+  selectedUser.value = user
+  showConfirmModal.value = true
+}
+
+// 2. Mengeksekusi Poin Kuis
+const confirmGivePoints = async () => {
+  if (!selectedUser.value) return
+  isGivingPoints.value = true
+  
+  clearTimeout(toastTimer)
+  showToast.value = false
+
+  try {
+    const token = localStorage.getItem('access_token')
+    const response = await axios.post(`https://semskii1-ag-connect-api.hf.space/users/${selectedUser.value.id}/add-quiz-points`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+
+    // Update poin di UI
+    selectedUser.value.points += 10
+    
+    // Tampilkan Notifikasi Sukses
+    toastType.value = 'success'
+    toastMessage.value = response.data.message
+    showToast.value = true
+
+  } catch (error) {
+    // Tampilkan Notifikasi Error
+    toastType.value = 'error'
+    toastMessage.value = error.response?.data?.detail || "Gagal memberikan poin."
+    showToast.value = true
+  } finally {
+    isGivingPoints.value = false
+    showConfirmModal.value = false
+    selectedUser.value = null
+    
+    // Hilangkan toast setelah 3 detik
+    toastTimer = setTimeout(() => { showToast.value = false }, 3000)
+  }
+}
+
 const agLogs = computed(() => allLogs.value.filter(log => log.service_type === 'AG').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time)))
 const agLiteLogs = computed(() => allLogs.value.filter(log => log.service_type === 'AG Lite').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time)))
 
-// Logika Leaderboard Gamifikasi
 const topUsers = computed(() => {
   return [...allUsers.value]
-    .sort((a, b) => b.points - a.points) // Urutkan dari poin tertinggi
-    .filter(u => u.points >= 0) // Tampilkan semua yang poinnya >= 0
-    .slice(0, 10) // Ambil 10 besar
+    .sort((a, b) => b.points - a.points)
+    .filter(u => u.points >= 0)
 })
 </script>
 
 <style scoped>
+/* Animasi Masuk Biasa */
 .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
 @keyframes fadeInUp {
   0% { opacity: 0; transform: translateY(20px) scale(0.95); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Animasi Bouncing untuk Ikon Kado */
+.animate-bounce { animation: bounce 2s infinite; }
+@keyframes bounce {
+  0%, 100% { transform: translateY(-20%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
+  50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+}
+
+/* Animasi Transisi Vue (Fade Modal & Bounce Toast) */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active .bg-\[\#111\] { animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+@keyframes scaleIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.bounce-enter-active { animation: bounceInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.bounce-leave-active { animation: fadeOutDown 0.3s ease-in forwards; }
+
+@keyframes bounceInUp {
+  0% { transform: translate(-50%, 100%); opacity: 0; }
+  100% { transform: translate(-50%, 0); opacity: 1; }
+}
+@keyframes fadeOutDown {
+  0% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, 100%); opacity: 0; }
 }
 </style>

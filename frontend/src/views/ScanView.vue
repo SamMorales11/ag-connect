@@ -38,10 +38,17 @@
         </div>
 
         <div class="relative w-full overflow-hidden rounded-2xl bg-black/60 border-2 border-dashed border-white/20 transition-all duration-300"
-             :class="{'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]': successMessage, 'border-red-500/50': errorMessage}">
+             :class="{
+               'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]': statusType === 'success', 
+               'border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.2)]': statusType === 'warning',
+               'border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.2)]': statusType === 'error'
+             }">
           
           <div id="reader" class="w-full h-[300px] flex items-center justify-center relative z-10"></div>
-          <div v-if="successMessage" class="absolute inset-0 bg-emerald-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
+          
+          <div v-if="statusType === 'success'" class="absolute inset-0 bg-emerald-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
+          <div v-else-if="statusType === 'warning'" class="absolute inset-0 bg-amber-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
+          <div v-else-if="statusType === 'error'" class="absolute inset-0 bg-red-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
         </div>
 
         <button @click="toggleCamera" :disabled="isProcessing" class="mt-6 flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 border border-gray-600 rounded-xl text-white font-bold text-sm transition-all shadow-lg transform active:scale-95 disabled:opacity-50">
@@ -50,13 +57,17 @@
         </button>
         
         <transition name="fade" mode="out-in">
-          <div v-if="successMessage" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md">
-            <p class="font-bold text-white text-lg mb-0.5">Berhasil!</p>
-            <p class="text-emerald-400 text-sm font-medium">{{ successMessage }}</p>
+          <div v-if="statusType === 'success'" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md">
+            <p class="font-bold text-white text-lg mb-0.5">{{ statusTitle }}</p>
+            <p class="text-emerald-400 text-sm font-medium">{{ statusMessage }}</p>
           </div>
-          <div v-else-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md">
-            <p class="font-bold text-white text-lg mb-0.5">Akses Ditolak</p>
-            <p class="text-red-400 text-sm font-medium">{{ errorMessage }}</p>
+          <div v-else-if="statusType === 'warning'" class="w-full mt-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-center backdrop-blur-md">
+            <p class="font-bold text-white text-lg mb-0.5">{{ statusTitle }}</p>
+            <p class="text-amber-400 text-sm font-medium">{{ statusMessage }}</p>
+          </div>
+          <div v-else-if="statusType === 'error'" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md">
+            <p class="font-bold text-white text-lg mb-0.5">{{ statusTitle }}</p>
+            <p class="text-red-400 text-sm font-medium">{{ statusMessage }}</p>
           </div>
         </transition>
 
@@ -80,13 +91,15 @@ import { Html5Qrcode } from 'html5-qrcode'
 import axios from 'axios'
 
 const router = useRouter()
-const successMessage = ref('')
-const errorMessage = ref('')
+
+// Manajemen Notifikasi
+const statusType = ref('') // 'success', 'warning', 'error', atau ''
+const statusTitle = ref('')
+const statusMessage = ref('')
+
 const isProcessing = ref(false)
 const isFrontCamera = ref(false) 
-
-// [BARU] Variabel untuk menampung pilihan Ibadah
-const selectedService = ref('AG') // Default ke AG
+const selectedService = ref('AG') 
 
 // Logika Hak Akses
 const isAdmin = ref(false)
@@ -111,6 +124,7 @@ onMounted(async () => {
     router.push('/')
     return
   }
+  
   html5QrCode = new Html5Qrcode("reader")
   startCamera()
 })
@@ -134,7 +148,9 @@ const startCamera = async () => {
       onScanFailure
     )
   } catch (err) {
-    errorMessage.value = "Kamera tidak terdeteksi atau izin ditolak."
+    statusType.value = 'error'
+    statusTitle.value = 'Kamera Gagal'
+    statusMessage.value = 'Kamera tidak terdeteksi atau izin ditolak.'
   }
 }
 
@@ -153,30 +169,44 @@ const onScanSuccess = async (decodedText) => {
   if (isProcessing.value) return 
   
   isProcessing.value = true
-  successMessage.value = ''
-  errorMessage.value = ''
+  statusType.value = ''
+  statusTitle.value = ''
+  statusMessage.value = ''
 
   try {
-    // [BARU] Kirim qr_code_data DAN service_type ke API
     const response = await axios.post('https://semskii1-ag-connect-api.hf.space/scan', {
       qr_code_data: decodedText,
       service_type: selectedService.value
     })
     
-    const jamAbsen = new Date(response.data.scan_time).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-    // [BARU] Notifikasi sukses menyebutkan tipe ibadah
-    successMessage.value = `Tercatat di ${response.data.service_type} (${jamAbsen})`
+    const msg = response.data.message
+    const jamAbsen = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    
+    // Logika Pemisahan Warna Berdasarkan Balasan Backend
+    if (msg.includes('+5')) {
+      statusType.value = 'success'
+      statusTitle.value = 'Poin Bertambah! 🎉'
+      statusMessage.value = `${msg} pada ${jamAbsen}`
+    } else {
+      statusType.value = 'warning'
+      statusTitle.value = 'Hadir Tercatat ✅'
+      statusMessage.value = `${msg} pada ${jamAbsen}`
+    }
     
   } catch (error) {
+    statusType.value = 'error'
+    statusTitle.value = 'Akses Ditolak ❌'
     if (error.response && error.response.status === 404) {
-      errorMessage.value = 'QR Code tidak terdaftar di sistem!'
+      statusMessage.value = 'QR Code tidak terdaftar di sistem!'
     } else {
-      errorMessage.value = 'Terjadi kesalahan jaringan atau server.'
+      statusMessage.value = 'Terjadi kesalahan jaringan atau server.'
     }
   } finally {
+    // Hilangkan notifikasi dan buka kunci scanner setelah 3 detik
     setTimeout(() => {
-      successMessage.value = ''
-      errorMessage.value = ''
+      statusType.value = ''
+      statusTitle.value = ''
+      statusMessage.value = ''
       isProcessing.value = false
     }, 3000)
   }
