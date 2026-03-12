@@ -216,7 +216,6 @@ const confirmModal = ref({
 
 const currentUser = ref(null)
 
-// [DIPERBAIKI] Mengganti isSuperAdmin menjadi isAdmin
 const isAdmin = computed(() => {
   return currentUser.value && currentUser.value.is_admin === true
 })
@@ -292,23 +291,35 @@ const closeConfirmModal = () => {
   confirmModal.value.show = false
 }
 
-// Eksekusi API berdasarkan tipe Modal (Delete/Promote)
+// --- [DIPERBAIKI] Eksekusi API berdasarkan tipe Modal (Delete/Promote) ---
 const executeAction = async () => {
   confirmModal.value.isLoading = true
   const { type, userId, userName } = confirmModal.value
 
+  // [BARU] Ambil kunci token dari browser
+  const token = localStorage.getItem('access_token')
+  const config = {
+    headers: { Authorization: `Bearer ${token}` }
+  }
+
   try {
     if (type === 'delete') {
-      await axios.delete(`https://semskii1-ag-connect-api.hf.space/users/${userId}`)
+      // [BARU] Sertakan config (token) saat mengirim permintaan hapus
+      await axios.delete(`https://semskii1-ag-connect-api.hf.space/users/${userId}`, config)
       showToast(`Data ${userName} berhasil dihapus.`, 'success')
     } 
     else if (type === 'promote') {
-      await axios.put(`https://semskii1-ag-connect-api.hf.space/users/${userId}/promote`)
+      // [BARU] Sertakan config (token) saat mengirim permintaan promosi, (perhatikan argumen {} kosong sebelum config untuk PUT request)
+      await axios.put(`https://semskii1-ag-connect-api.hf.space/users/${userId}/promote`, {}, config)
       showToast(`${userName} berhasil diangkat menjadi Admin!`, 'success')
     }
+    
+    // Refresh tabel data setelah berhasil
     await fetchUsers() 
+    
   } catch (error) {
     showToast(`Gagal memproses permintaan Anda.`, 'error')
+    console.error("Error eksekusi:", error)
   } finally {
     closeConfirmModal()
   }

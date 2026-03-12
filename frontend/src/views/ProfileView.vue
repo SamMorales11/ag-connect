@@ -57,12 +57,18 @@
         </div>
 
         <div class="shrink-0 flex flex-col items-center bg-black/40 p-4 rounded-2xl border border-white/5 transition-transform duration-500 group-hover:scale-105">
-          <div class="p-2 bg-white rounded-xl shadow-[0_0_20px_rgba(253,224,33,0.1)]">
-            <qrcode-vue :value="user.qr_code_data" :size="100" level="M" />
+          <div id="qr-canvas-container" class="p-2 bg-white rounded-xl shadow-[0_0_20px_rgba(253,224,33,0.1)]">
+            <qrcode-vue :value="user.qr_code_data" :size="120" level="M" render-as="canvas" />
           </div>
+          
           <p class="text-[10px] text-gray-500 font-mono mt-3 uppercase tracking-widest text-center w-full truncate max-w-[100px]" :title="user.qr_code_data">
             ID Akses
           </p>
+          
+          <button @click="generateCardAndDownload" class="mt-3 px-4 py-2 w-full bg-gradient-to-r from-ag-purple to-purple-600 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all flex justify-center items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            Unduh Kartu
+          </button>
         </div>
       </div>
 
@@ -182,9 +188,8 @@ const router = useRouter()
 const user = ref(null)
 const isLoading = ref(true)
 
-// [BARU] State untuk Modal Export
 const showExportModal = ref(false)
-const exportFilter = ref('today') // Default filter
+const exportFilter = ref('today')
 const isExporting = ref(false)
 
 onMounted(async () => {
@@ -213,13 +218,84 @@ onMounted(async () => {
 const goToScan = () => router.push('/scan')
 const goToDashboard = () => router.push('/dashboard')
 
-// [DIPERBAIKI] Fungsi Download dengan Parameter Filter
+// --- [BARU & DIPERBAIKI] FUNGSI GENERATE KARTU ID DIGITAL E-SPORT ---
+const generateCardAndDownload = () => {
+  // 1. Ambil kanvas asli dari qrcode-vue menggunakan ID bungkusannya
+  const qrContainer = document.getElementById('qr-canvas-container');
+  const originalQrCanvas = qrContainer ? qrContainer.querySelector('canvas') : null;
+
+  if (!originalQrCanvas) {
+    alert("Sistem masih memuat QR Code. Tunggu sebentar lalu klik lagi.");
+    return;
+  }
+
+  // 2. Buat kanvas baru untuk ID Card utuh (800 x 1200 resolusi HD)
+  const cardCanvas = document.createElement('canvas');
+  cardCanvas.width = 800;
+  cardCanvas.height = 1200;
+  const ctx = cardCanvas.getContext('2d');
+
+  // 3. Gambar Latar Belakang (Gradien Ungu Gelap - Hitam Pekat)
+  const gradient = ctx.createLinearGradient(0, 0, 800, 1200);
+  gradient.addColorStop(0, '#1E1030'); 
+  gradient.addColorStop(1, '#0A0A0A'); 
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 800, 1200);
+
+  // 4. Teks Judul
+  ctx.fillStyle = '#FDE047'; // Kuning AG
+  ctx.font = '900 60px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('AG CONNECT', 400, 160);
+
+  ctx.fillStyle = '#D1D5DB'; // Abu-abu cerah
+  ctx.font = 'bold 30px sans-serif';
+  ctx.fillText('KARTU JEMAAT DIGITAL', 400, 220);
+
+  // 5. Kotak Putih & Menempelkan QR Code
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(200, 280, 400, 400); // Frame putih untuk QR
+  ctx.drawImage(originalQrCanvas, 220, 300, 360, 360); // Tempel QR dari layar
+
+  // 6. Nama Lengkap
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = '900 50px sans-serif';
+  ctx.fillText(user.value.fullname.toUpperCase(), 400, 800);
+
+  // 7. Status Jemaat / Pelayan
+  ctx.fillStyle = '#A855F7'; // Ungu AG
+  ctx.font = 'bold 35px sans-serif';
+  ctx.fillText(user.value.status || 'Jemaat AG', 400, 860);
+
+  // 8. Kotak Info Kode Referal
+  ctx.fillStyle = '#111111';
+  ctx.fillRect(150, 950, 500, 150); // Background kotak referal
+  ctx.strokeStyle = '#374151'; // Garis pinggir kotak
+  ctx.lineWidth = 4;
+  ctx.strokeRect(150, 950, 500, 150); 
+
+  ctx.fillStyle = '#9CA3AF'; // Teks Abu-abu
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('KODE REFERAL SAYA:', 400, 1010);
+
+  ctx.fillStyle = '#10B981'; // Teks Hijau Menyala
+  ctx.font = '900 45px sans-serif';
+  ctx.fillText('@' + user.value.username, 400, 1060);
+
+  // 9. Download Hasil Akhir
+  const link = document.createElement('a');
+  link.download = `ID_Card_AG_${user.value.username}.png`; // Nama file sudah diubah!
+  link.href = cardCanvas.toDataURL('image/png', 1.0);
+  link.click();
+}
+
+// -------------------------------------------------------------
+
 const downloadReport = async () => {
   isExporting.value = true
   try {
     const token = localStorage.getItem('access_token')
     
-    // Menambahkan filter ke URL endpoint
     const response = await axios.get(`https://semskii1-ag-connect-api.hf.space/export/attendances?filter=${exportFilter.value}`, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob' 
@@ -229,7 +305,6 @@ const downloadReport = async () => {
     const link = document.createElement('a')
     link.href = url
     
-    // Membuat nama file yang sesuai dengan pilihan di Frontend
     const suffix = exportFilter.value === 'today' ? 'Hari_Ini' : 
                    exportFilter.value === 'week' ? '7_Hari_Terakhir' : 
                    exportFilter.value === 'month' ? 'Bulan_Ini' : 'Semua'
@@ -242,7 +317,6 @@ const downloadReport = async () => {
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
     
-    // Tutup modal setelah sukses
     showExportModal.value = false
 
   } catch (error) {

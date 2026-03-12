@@ -27,17 +27,43 @@
 
       <div v-else>
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-white/10 pb-4">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 border-b border-white/10 pb-4">
           <div class="flex flex-wrap gap-2">
             <button @click="activeTab = 'Leaderboard'" :class="activeTab === 'Leaderboard' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent">
               🏆 Top Leaderboard
             </button>
             <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg shadow-ag-purple/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent">
-              Ibadah AG ({{ agLogs.length }})
+              Ibadah AG ({{ filteredAgLogs.length }})
             </button>
             <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg shadow-ag-yellow/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent">
-              Ibadah AG Lite ({{ agLiteLogs.length }})
+              Ibadah AG Lite ({{ filteredAgLiteLogs.length }})
             </button>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            
+            <div v-if="activeTab !== 'Leaderboard'" class="relative w-full sm:w-44">
+              <input 
+                v-model="selectedDate" 
+                type="date" 
+                class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:border-ag-purple focus:ring-1 focus:ring-ag-purple outline-none transition-all cursor-pointer custom-date-input"
+              >
+              <button v-if="selectedDate" @click="selectedDate = ''" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+
+            <div class="relative w-full sm:w-64">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <input 
+                v-model="searchQuery" 
+                type="text" 
+                placeholder="Cari nama jemaat..." 
+                class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl pl-10 pr-4 py-2.5 focus:border-ag-yellow focus:ring-1 focus:ring-ag-yellow outline-none transition-all placeholder-gray-500"
+              >
+            </div>
           </div>
         </div>
 
@@ -54,15 +80,15 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-if="topUsers.length === 0">
-                    <td colspan="4" class="py-16 text-center text-gray-500 text-sm font-medium">Belum ada data jemaat.</td>
+                  <tr v-if="paginatedUsers.length === 0">
+                    <td colspan="4" class="py-16 text-center text-gray-500 text-sm font-medium">Jemaat tidak ditemukan.</td>
                   </tr>
-                  <tr v-else v-for="(user, index) in topUsers" :key="user.id" class="hover:bg-white/[0.03] transition-colors">
+                  <tr v-else v-for="(user, index) in paginatedUsers" :key="user.id" class="hover:bg-white/[0.03] transition-colors">
                     <td class="py-4 px-6 text-center">
-                      <div v-if="index === 0" class="w-8 h-8 mx-auto bg-yellow-500 text-gray-900 rounded-full flex items-center justify-center font-black shadow-lg">1</div>
-                      <div v-else-if="index === 1" class="w-8 h-8 mx-auto bg-gray-400 text-gray-900 rounded-full flex items-center justify-center font-black shadow-lg">2</div>
-                      <div v-else-if="index === 2" class="w-8 h-8 mx-auto bg-orange-600 text-white rounded-full flex items-center justify-center font-black shadow-lg">3</div>
-                      <div v-else class="text-gray-400 font-bold">{{ index + 1 }}</div>
+                      <div v-if="(currentPage - 1) * itemsPerPage + index === 0" class="w-8 h-8 mx-auto bg-yellow-500 text-gray-900 rounded-full flex items-center justify-center font-black shadow-lg">1</div>
+                      <div v-else-if="(currentPage - 1) * itemsPerPage + index === 1" class="w-8 h-8 mx-auto bg-gray-400 text-gray-900 rounded-full flex items-center justify-center font-black shadow-lg">2</div>
+                      <div v-else-if="(currentPage - 1) * itemsPerPage + index === 2" class="w-8 h-8 mx-auto bg-orange-600 text-white rounded-full flex items-center justify-center font-black shadow-lg">3</div>
+                      <div v-else class="text-gray-400 font-bold">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</div>
                     </td>
                     <td class="py-4 px-6">
                       <div class="font-bold text-gray-200">{{ user.fullname }}</div>
@@ -97,10 +123,13 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-if="(activeTab === 'AG' ? agLogs : agLiteLogs).length === 0">
-                    <td colspan="3" class="py-12 text-center text-gray-500 text-sm">Tidak ada data absensi.</td>
+                  <tr v-if="(activeTab === 'AG' ? paginatedAgLogs : paginatedAgLiteLogs).length === 0">
+                    <td colspan="3" class="py-12 text-center text-gray-500 text-sm">
+                      <span v-if="selectedDate">Tidak ada data absensi untuk tanggal ini.</span>
+                      <span v-else>Data tidak ditemukan.</span>
+                    </td>
                   </tr>
-                  <tr v-else v-for="log in (activeTab === 'AG' ? agLogs : agLiteLogs)" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
+                  <tr v-else v-for="log in (activeTab === 'AG' ? paginatedAgLogs : paginatedAgLiteLogs)" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
                     <td class="py-4 px-6"><span class="text-xs font-mono text-gray-300">{{ new Date(log.scan_time).toLocaleString('id-ID') }}</span></td>
                     <td class="py-4 px-6 font-bold text-gray-200">{{ log.user?.fullname || 'User Dihapus' }}</td>
                     <td class="py-4 px-6 text-xs text-gray-400">{{ log.user?.status || '-' }}</td>
@@ -108,6 +137,20 @@
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+
+        <div v-if="currentTotalPages > 1" class="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4 animate-fade-in-up">
+          <span class="text-sm font-medium text-gray-500">
+            Halaman <span class="text-white">{{ currentPage }}</span> dari <span class="text-white">{{ currentTotalPages }}</span>
+          </span>
+          <div class="flex gap-2">
+            <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+              Sebelumnya
+            </button>
+            <button @click="nextPage" :disabled="currentPage === currentTotalPages" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+              Selanjutnya
+            </button>
           </div>
         </div>
 
@@ -149,7 +192,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -159,11 +202,20 @@ const allLogs = ref([])
 const allUsers = ref([])
 const activeTab = ref('Leaderboard') 
 
-// State Custom Modal & Notifikasi
+// State Pencarian, Filter Tanggal & Paginasi
+const searchQuery = ref('')
+const selectedDate = ref('') // Menyimpan tanggal berformat YYYY-MM-DD
+const currentPage = ref(1)
+const itemsPerPage = 20
+
+// Reset kembali ke Halaman 1 jika filter berubah
+watch([searchQuery, activeTab, selectedDate], () => {
+  currentPage.value = 1
+})
+
 const showConfirmModal = ref(false)
 const selectedUser = ref(null)
 const isGivingPoints = ref(false)
-
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref('success')
@@ -193,17 +245,14 @@ const fetchData = async (token) => {
   }
 }
 
-// 1. Membuka Custom Modal
 const openConfirmModal = (user) => {
   selectedUser.value = user
   showConfirmModal.value = true
 }
 
-// 2. Mengeksekusi Poin Kuis
 const confirmGivePoints = async () => {
   if (!selectedUser.value) return
   isGivingPoints.value = true
-  
   clearTimeout(toastTimer)
   showToast.value = false
 
@@ -212,17 +261,11 @@ const confirmGivePoints = async () => {
     const response = await axios.post(`https://semskii1-ag-connect-api.hf.space/users/${selectedUser.value.id}/add-quiz-points`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     })
-
-    // Update poin di UI
     selectedUser.value.points += 10
-    
-    // Tampilkan Notifikasi Sukses
     toastType.value = 'success'
     toastMessage.value = response.data.message
     showToast.value = true
-
   } catch (error) {
-    // Tampilkan Notifikasi Error
     toastType.value = 'error'
     toastMessage.value = error.response?.data?.detail || "Gagal memberikan poin."
     showToast.value = true
@@ -230,38 +273,81 @@ const confirmGivePoints = async () => {
     isGivingPoints.value = false
     showConfirmModal.value = false
     selectedUser.value = null
-    
-    // Hilangkan toast setelah 3 detik
     toastTimer = setTimeout(() => { showToast.value = false }, 3000)
   }
 }
 
-const agLogs = computed(() => allLogs.value.filter(log => log.service_type === 'AG').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time)))
-const agLiteLogs = computed(() => allLogs.value.filter(log => log.service_type === 'AG Lite').sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time)))
-
-const topUsers = computed(() => {
-  return [...allUsers.value]
-    .sort((a, b) => b.points - a.points)
-    .filter(u => u.points >= 0)
+// LOGIKA FILTER LEADERBOARD
+const filteredUsers = computed(() => {
+  let users = [...allUsers.value].sort((a, b) => b.points - a.points).filter(u => u.points >= 0)
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    users = users.filter(u => u.fullname.toLowerCase().includes(q) || u.username.toLowerCase().includes(q))
+  }
+  return users
 })
+
+// LOGIKA FILTER LOG ABSENSI (TANGGAL + PENCARIAN)
+const getFilteredLogs = (type) => {
+  let logs = allLogs.value.filter(log => log.service_type === type).sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time))
+  
+  // 1. Filter Berdasarkan Pencarian Nama
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    logs = logs.filter(log => (log.user?.fullname || '').toLowerCase().includes(q))
+  }
+
+  // 2. Filter Berdasarkan Tanggal
+  if (selectedDate.value) {
+    logs = logs.filter(log => {
+      // Mengubah scan_time (UTC) menjadi string tanggal lokal (YYYY-MM-DD)
+      const dateObj = new Date(log.scan_time)
+      const year = dateObj.getFullYear()
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0')
+      const day = String(dateObj.getDate()).padStart(2, '0')
+      const formattedLogDate = `${year}-${month}-${day}`
+      
+      return formattedLogDate === selectedDate.value
+    })
+  }
+
+  return logs
+}
+
+const filteredAgLogs = computed(() => getFilteredLogs('AG'))
+const filteredAgLiteLogs = computed(() => getFilteredLogs('AG Lite'))
+
+// LOGIKA PAGINASI (20 DATA PER HALAMAN)
+const paginatedUsers = computed(() => filteredUsers.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
+const paginatedAgLogs = computed(() => filteredAgLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
+const paginatedAgLiteLogs = computed(() => filteredAgLiteLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
+
+// HITUNG TOTAL HALAMAN
+const currentTotalPages = computed(() => {
+  if (activeTab.value === 'Leaderboard') return Math.ceil(filteredUsers.value.length / itemsPerPage)
+  if (activeTab.value === 'AG') return Math.ceil(filteredAgLogs.value.length / itemsPerPage)
+  return Math.ceil(filteredAgLiteLogs.value.length / itemsPerPage)
+})
+
+// KONTROL TOMBOL HALAMAN
+const nextPage = () => { if (currentPage.value < currentTotalPages.value) currentPage.value++ }
+const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
+
 </script>
 
 <style scoped>
-/* Animasi Masuk Biasa */
 .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
 @keyframes fadeInUp {
   0% { opacity: 0; transform: translateY(20px) scale(0.95); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Animasi Bouncing untuk Ikon Kado */
 .animate-bounce { animation: bounce 2s infinite; }
 @keyframes bounce {
   0%, 100% { transform: translateY(-20%); animation-timing-function: cubic-bezier(0.8, 0, 1, 1); }
   50% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
 }
 
-/* Animasi Transisi Vue (Fade Modal & Bounce Toast) */
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 .fade-enter-active .bg-\[\#111\] { animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -281,5 +367,15 @@ const topUsers = computed(() => {
 @keyframes fadeOutDown {
   0% { transform: translate(-50%, 0); opacity: 1; }
   100% { transform: translate(-50%, 100%); opacity: 0; }
+}
+
+/* Modifikasi Icon Kalender bawaan browser agar tetap terlihat rapi di Dark Mode */
+.custom-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.6;
+  cursor: pointer;
+}
+.custom-date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 </style>

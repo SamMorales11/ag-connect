@@ -146,7 +146,7 @@ def get_users(db: Session = Depends(get_db)):
 def get_attendance_logs(db: Session = Depends(get_db)):
     return db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
 
-# --- [BARU] TAMBAH POIN KUIS (KHUSUS ADMIN) ---
+# --- TAMBAH POIN KUIS (KHUSUS ADMIN) ---
 @app.post("/users/{user_id}/add-quiz-points")
 def add_quiz_points(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
     # 1. Pastikan yang menekan tombol adalah Admin
@@ -164,3 +164,34 @@ def add_quiz_points(user_id: int, db: Session = Depends(get_db), current_admin: 
     db.commit()
     
     return {"message": f"🎉 10 Poin Kuis berhasil dikirim ke {target_user.fullname}!"}
+
+# --- [BARU] FUNGSI HAPUS JEMAAT (KHUSUS ADMIN) ---
+@app.delete("/users/{user_id}")
+def delete_user(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    # Verifikasi akses admin
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat menghapus data.")
+        
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Jemaat tidak ditemukan")
+    
+    db.delete(user)
+    db.commit()
+    return {"message": "Data jemaat berhasil dihapus"}
+
+# --- [BARU] FUNGSI PROMOSI JEMAAT MENJADI ADMIN (KHUSUS ADMIN) ---
+@app.put("/users/{user_id}/promote")
+def promote_user(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    # Verifikasi akses admin
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat melakukan promosi.")
+        
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Jemaat tidak ditemukan")
+    
+    user.is_admin = True
+    db.add(user)
+    db.commit()
+    return {"message": "Jemaat berhasil diangkat menjadi Admin"}
