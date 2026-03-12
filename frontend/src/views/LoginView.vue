@@ -1,11 +1,10 @@
 <template>
-  <div class="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 relative overflow-hidden">
+  <div class="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 relative overflow-hidden font-sans">
     
     <div class="absolute top-[-15%] left-[-10%] w-[500px] h-[500px] bg-ag-purple rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse"></div>
-    
     <div class="absolute bottom-[-15%] right-[-10%] w-[400px] h-[400px] bg-ag-yellow rounded-full mix-blend-screen filter blur-[120px] opacity-10"></div>
 
-    <div class="relative w-full max-w-md p-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-10">
+    <div class="relative w-full max-w-md p-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-10 transition-all duration-500">
       
       <div class="text-center mb-10">
         <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-ag-purple mb-2 tracking-tight">
@@ -14,8 +13,8 @@
         <p class="text-gray-400 text-sm tracking-widest uppercase font-semibold">Sistem Manajemen Jemaat</p>
       </div>
 
-      <div v-if="errorMessage" class="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-xl text-sm text-center backdrop-blur-sm transition-all">
-        {{ errorMessage }}
+      <div v-if="errorMessage" class="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-xl text-sm text-center backdrop-blur-sm animate-fade-in-up">
+        ❌ {{ errorMessage }}
       </div>
 
       <form @submit.prevent="handleLogin" class="space-y-6">
@@ -53,6 +52,7 @@
           <span v-else>Masuk ke Sistem</span>
         </button>
       </form>
+      
       <p class="mt-8 text-center text-sm text-gray-400">
         Belum memiliki Kartu Jemaat? 
         <button @click="$router.push('/register')" class="text-ag-purple hover:text-ag-yellow font-bold transition-colors">Daftar di sini</button>
@@ -78,23 +78,41 @@ const handleLogin = async () => {
 
   try {
     const formData = new URLSearchParams()
-    formData.append('username', username.value)
-    formData.append('password', password.value)
+    // [DIPERBAIKI] Membersihkan spasi dan memaksa username menjadi huruf kecil
+    formData.append('username', username.value.trim().toLowerCase())
+    formData.append('password', password.value.trim())
 
     const response = await axios.post('https://semskii1-ag-connect-api.hf.space/login', formData, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
 
+    // Simpan token ke localStorage
     localStorage.setItem('access_token', response.data.access_token)
+    
+    // Redirect ke halaman profile setelah login berhasil
     router.push('/profile')
+    
   } catch (error) {
+    // [DEBUG] Menampilkan detail error di konsol browser (Tekan F12 untuk melihat)
+    console.error("Login Error Detail:", error.response?.data)
+
     if (error.response && error.response.status === 401) {
       errorMessage.value = 'Kredensial tidak valid. Silakan coba lagi.'
+    } else if (error.response && error.response.status === 404) {
+      errorMessage.value = 'Endpoint login tidak ditemukan. Pastikan backend sudah terupdate.'
     } else {
-      errorMessage.value = 'Server tidak merespons. Pastikan backend menyala.'
+      errorMessage.value = 'Server tidak merespons. Pastikan backend di Hugging Face menyala.'
     }
   } finally {
     isLoading.value = false
   }
 }
 </script>
+
+<style scoped>
+.animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+</style>

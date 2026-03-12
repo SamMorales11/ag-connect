@@ -19,7 +19,7 @@ class UserResponse(UserBase):
     qr_code_data: Optional[str] = None
     is_admin: bool  
     created_at: datetime
-    points: int # [BARU] Menampilkan poin jemaat ke frontend
+    points: int
 
     class Config:
         from_attributes = True
