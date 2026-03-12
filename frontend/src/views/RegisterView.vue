@@ -202,8 +202,8 @@ const debounceCheckReferral = () => {
   
   debounceTimer = setTimeout(async () => {
     try {
-      // Hilangkan simbol @ jika user tidak sengaja mengetiknya
-      const cleanCode = referralCode.value.trim().replace('@', '')
+      // Hilangkan simbol @ dan jadikan huruf kecil
+      const cleanCode = referralCode.value.trim().toLowerCase().replace('@', '')
       const res = await axios.get(`https://semskii1-ag-connect-api.hf.space/users/check-referral/${cleanCode}`)
       referralStatus.value = 'valid'
       referrerName.value = res.data.fullname
@@ -216,7 +216,7 @@ const debounceCheckReferral = () => {
 
 const form = ref({
   fullname: '',
-  username: '', // [DIPERBAIKI]
+  username: '',
   whatsapp: '',
   date_of_birth: '',
   pekerjaan: 'Siswa',
@@ -239,10 +239,9 @@ const handleRegister = async () => {
     }
   }
 
-  // [DIPERBAIKI] Gunakan input username dari form, bersihkan spasi agar aman
   const finalUsername = form.value.username.toLowerCase().replace(/\s+/g, '')
   const finalPassword = isUsher ? form.value.password : 'default_ag_password_123!'
-  const cleanReferral = referralStatus.value === 'valid' ? referralCode.value.trim().replace('@', '') : null
+  const cleanReferral = referralStatus.value === 'valid' ? referralCode.value.trim().toLowerCase().replace('@', '') : null
 
   const payload = {
     fullname: form.value.fullname,
