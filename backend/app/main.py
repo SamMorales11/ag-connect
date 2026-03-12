@@ -29,7 +29,7 @@ app = FastAPI(title="AG Connect API")
 # ==========================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Mengizinkan semua origin untuk mencegah error block saat download file
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -85,12 +85,43 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
+# ==========================
+# [BARU] CEK KODE REFERAL (LIVE VERIFICATION)
+# ==========================
+@app.get("/users/check-referral/{username}")
+def check_referral(username: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Username tidak ditemukan")
+    
+    # Hanya mengembalikan nama depan untuk keamanan privasi
+    nama_depan = user.fullname.split()[0]
+    return {"valid": True, "fullname": nama_depan}
+
+
+# ==========================
+# [DIPERBAIKI] REGISTER (TAMBAH LOGIKA POIN)
+# ==========================
 @app.post("/register", response_model=schemas.UserResponse)
 def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username sudah terdaftar")
     
+    # Logika Gamifikasi: Poin Referal
+    initial_points = 0
+    valid_referrer = None
+    
+    if user.referred_by:
+        referrer_db = db.query(models.User).filter(models.User.username == user.referred_by).first()
+        if referrer_db:
+            valid_referrer = referrer_db.username
+            initial_points = 2  # Jemaat baru dapat 2 poin modal awal
+            
+            # Jemaat yang ngajak langsung dapat tambahan 2 poin
+            referrer_db.points += 2
+            db.add(referrer_db)
+
     hashed_password = get_password_hash(user.password)
     qr_data = str(uuid.uuid4()) 
     
@@ -102,7 +133,9 @@ def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
         status=user.status,
         talents=user.talents,
         date_of_birth=user.date_of_birth,
-        qr_code_data=qr_data
+        qr_code_data=qr_data,
+        points=initial_points,             # <--- Tambahan
+        referred_by=valid_referrer         # <--- Tambahan
     )
     db.add(new_user)
     db.commit()
@@ -124,11 +157,19 @@ def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
+# ==========================
+# [DIPERBAIKI] SCAN (TAMBAH POIN KEHADIRAN)
+# ==========================
 @app.post("/scan")
 def scan_attendance(request: ScanRequestData, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.qr_code_data == request.qr_code_data).first()
     if not user:
         raise HTTPException(status_code=404, detail="QR Code tidak valid")
+        
+    # Tambahkan 5 Poin untuk jemaat yang hadir
+    user.points += 5
+    db.add(user)
+
     new_attendance = models.Attendance(user_id=user.id, service_type=request.service_type)
     db.add(new_attendance)
     db.commit()

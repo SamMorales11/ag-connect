@@ -8,7 +8,8 @@ class UserBase(BaseModel):
     whatsapp: Optional[str] = None
     status: Optional[str] = None
     talents: Optional[str] = None
-    date_of_birth: Optional[str] = None # Menyimpan tanggal lahir
+    date_of_birth: Optional[str] = None 
+    referred_by: Optional[str] = None # [BARU] Menyimpan username teman yang mengajak
 
 class UserCreate(UserBase):
     password: str 
@@ -18,6 +19,7 @@ class UserResponse(UserBase):
     qr_code_data: Optional[str] = None
     is_admin: bool  
     created_at: datetime
+    points: int # [BARU] Menampilkan poin jemaat ke frontend
 
     class Config:
         from_attributes = True
@@ -57,8 +59,8 @@ class UserForAttendance(BaseModel):
 class AttendanceListResponse(BaseModel):
     id: int
     scan_time: datetime
-    service_type: Optional[str] = "AG" # [BARU] Menambahkan tipe ibadah
-    user: UserForAttendance              # [DIPERBAIKI] Diubah dari 'owner' menjadi 'user'
+    service_type: Optional[str] = "AG" 
+    user: UserForAttendance              
 
     class Config:
         from_attributes = True

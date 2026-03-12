@@ -17,6 +17,8 @@ class User(Base):
     qr_code_data = Column(String, unique=True, index=True)
     is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    points = Column(Integer, default=0)
+    referred_by = Column(String, nullable=True)
 
     # [BARU] Relasi balik ke tabel Attendance
     # cascade="all, delete-orphan" artinya jika user dihapus, data absensinya juga ikut terhapus otomatis

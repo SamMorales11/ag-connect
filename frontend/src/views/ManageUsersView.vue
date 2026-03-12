@@ -37,9 +37,9 @@
           <input v-model="searchQuery" type="text" class="w-full pl-11 pr-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/50 text-white placeholder-gray-500 outline-none transition-all text-sm" placeholder="Cari nama, status, atau pelayanan...">
         </div>
         <div class="flex items-center gap-3">
-          <span v-if="isSuperAdmin" class="px-3 py-1 bg-ag-yellow/20 text-ag-yellow border border-ag-yellow/30 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(253,224,33,0.3)]">
+          <span v-if="isAdmin" class="px-3 py-1 bg-ag-yellow/20 text-ag-yellow border border-ag-yellow/30 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-1 shadow-[0_0_10px_rgba(253,224,33,0.3)]">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 7 6-7 6 7 3-7v12H3V6z"></path></svg>
-            Mode Superadmin
+            Akses Admin
           </span>
           <span class="text-xs font-bold text-gray-400 uppercase tracking-widest ml-4">Total:</span>
           <span class="px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg font-black">{{ filteredUsers.length }}</span>
@@ -119,11 +119,11 @@
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                     </button>
 
-                    <button v-if="isSuperAdmin && !user.is_admin" @click="openConfirmModal('promote', user)" class="p-2 bg-ag-yellow/10 text-ag-yellow hover:bg-ag-yellow hover:text-gray-900 rounded-lg transition-colors border border-ag-yellow/20 hover:shadow-[0_0_15px_rgba(253,224,33,0.5)]" title="Angkat Menjadi Admin">
+                    <button v-if="isAdmin && !user.is_admin" @click="openConfirmModal('promote', user)" class="p-2 bg-ag-yellow/10 text-ag-yellow hover:bg-ag-yellow hover:text-gray-900 rounded-lg transition-colors border border-ag-yellow/20 hover:shadow-[0_0_15px_rgba(253,224,33,0.5)]" title="Angkat Menjadi Admin">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 7 6-7 6 7 3-7v12H3V6z"></path></svg>
                     </button>
 
-                    <button v-if="isSuperAdmin && user.username !== 'admin_ag'" @click="openConfirmModal('delete', user)" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20" title="Hapus Data">
+                    <button v-if="isAdmin && currentUser && user.id !== currentUser.id" @click="openConfirmModal('delete', user)" class="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20" title="Hapus Data">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
 
@@ -215,8 +215,10 @@ const confirmModal = ref({
 })
 
 const currentUser = ref(null)
-const isSuperAdmin = computed(() => {
-  return currentUser.value && currentUser.value.username === 'admin_ag'
+
+// [DIPERBAIKI] Mengganti isSuperAdmin menjadi isAdmin
+const isAdmin = computed(() => {
+  return currentUser.value && currentUser.value.is_admin === true
 })
 
 onMounted(async () => {

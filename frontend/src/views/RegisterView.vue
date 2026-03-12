@@ -84,6 +84,36 @@
             </div>
           </template>
 
+          <div class="mt-4 p-5 bg-black/40 border border-white/5 rounded-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full" :class="referralStatus === 'valid' ? 'bg-emerald-500' : (referralStatus === 'invalid' ? 'bg-red-500' : 'bg-ag-purple')"></div>
+            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 pl-2">Kode Referal (Opsional)</label>
+            <div class="relative pl-2">
+              <input 
+                v-model="referralCode" 
+                @input="debounceCheckReferral" 
+                type="text" 
+                class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white placeholder-gray-600 outline-none transition-all" 
+                placeholder="Ketik username teman yang mengajak..."
+              >
+              <div v-if="referralStatus === 'loading'" class="absolute right-4 top-3.5">
+                <svg class="animate-spin h-5 w-5 text-ag-purple" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              </div>
+            </div>
+            
+            <div class="pl-2">
+              <div v-if="referralStatus === 'valid'" class="mt-2 text-xs text-emerald-400 flex items-center gap-1.5 font-medium animate-fade-in-up">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Kode Valid! Anda diajak oleh: <span class="font-bold text-white uppercase">{{ referrerName }}</span>
+              </div>
+              <div v-if="referralStatus === 'invalid'" class="mt-2 text-xs text-red-400 flex items-center gap-1.5 font-medium animate-fade-in-up">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                Username tidak ditemukan.
+              </div>
+              <p v-if="referralStatus === 'idle'" class="mt-2 text-[10px] text-gray-500 font-medium tracking-wide">
+                Kosongkan jika Anda mendaftar sendiri.
+              </p>
+            </div>
+          </div>
           <button type="submit" :disabled="isLoading" :class="tab === 'jemaat' ? 'from-ag-purple to-[#5b1d66] hover:shadow-[0_0_20px_rgba(124,40,137,0.4)] text-white' : 'from-ag-yellow to-[#e5c910] hover:shadow-[0_0_20px_rgba(253,224,33,0.4)] text-gray-900'" class="w-full mt-6 bg-gradient-to-r font-extrabold py-4 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] flex justify-center items-center disabled:opacity-50">
             <span v-if="isLoading">Memproses Data...</span>
             <span v-else>Daftar & Buat QR Code</span>
@@ -150,6 +180,40 @@ const registeredData = ref(null)
 // Referensi DOM untuk membungkus QR Code agar bisa di-download
 const qrContainer = ref(null)
 
+// ==========================================
+// STATE UNTUK KODE REFERAL
+// ==========================================
+const referralCode = ref('')
+const referralStatus = ref('idle') // Status: idle, loading, valid, invalid
+const referrerName = ref('')
+let debounceTimer = null
+
+const debounceCheckReferral = () => {
+  clearTimeout(debounceTimer)
+  
+  // Jika kotak referal kosong, kembalikan ke status awal
+  if (!referralCode.value.trim()) {
+    referralStatus.value = 'idle'
+    referrerName.value = ''
+    return
+  }
+
+  referralStatus.value = 'loading'
+  
+  // Tunggu 800ms setelah user berhenti mengetik sebelum menembak API
+  debounceTimer = setTimeout(async () => {
+    try {
+      const res = await axios.get(`https://semskii1-ag-connect-api.hf.space/users/check-referral/${referralCode.value.trim()}`)
+      referralStatus.value = 'valid'
+      referrerName.value = res.data.fullname
+    } catch (error) {
+      referralStatus.value = 'invalid'
+      referrerName.value = ''
+    }
+  }, 800)
+}
+// ==========================================
+
 const form = ref({
   fullname: '',
   whatsapp: '',
@@ -188,7 +252,8 @@ const handleRegister = async () => {
     whatsapp: form.value.whatsapp,
     date_of_birth: form.value.date_of_birth,
     status: tab.value === 'jemaat' ? form.value.pekerjaan : 'Pelayan Tuhan',
-    talents: tab.value === 'pelayan' ? form.value.pelayanan : 'Jemaat Umum'
+    talents: tab.value === 'pelayan' ? form.value.pelayanan : 'Jemaat Umum',
+    referred_by: referralStatus.value === 'valid' ? referralCode.value.trim() : null // [BARU] Sisipkan referal
   }
 
   try {
