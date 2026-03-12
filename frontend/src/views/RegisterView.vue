@@ -27,6 +27,11 @@
           </div>
 
           <div>
+            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Buat Username (Untuk Kode Referal)</label>
+            <input v-model="form.username" type="text" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white placeholder-gray-600 outline-none transition-all" placeholder="Misal: samuel28 (Tanpa spasi)">
+          </div>
+
+          <div>
             <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Tanggal Lahir</label>
             <input v-model="form.date_of_birth" type="date" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white outline-none transition-all appearance-none" style="color-scheme: dark;">
           </div>
@@ -42,8 +47,8 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Username Sosmed / WA</label>
-              <input v-model="form.whatsapp" type="text" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white placeholder-gray-600 outline-none transition-all" placeholder="@instagram atau 0812...">
+              <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp</label>
+              <input v-model="form.whatsapp" type="text" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-ag-purple/50 text-white placeholder-gray-600 outline-none transition-all" placeholder="0812...">
             </div>
           </template>
 
@@ -67,13 +72,9 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
                 Akses Scanner Usher
               </p>
-              <div>
-                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Buat Username Login</label>
-                <input v-model="form.username" type="text" required class="w-full px-4 py-3 bg-black/60 border border-gray-600 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white placeholder-gray-500 outline-none transition-all" placeholder="Misal: usher_samuel">
-              </div>
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Password</label>
+                  <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Password Login</label>
                   <input v-model="form.password" type="password" required class="w-full px-4 py-3 bg-black/60 border border-gray-600 rounded-xl focus:ring-2 focus:ring-ag-yellow/50 text-white outline-none transition-all" placeholder="••••••••">
                 </div>
                 <div>
@@ -86,7 +87,7 @@
 
           <div class="mt-4 p-5 bg-black/40 border border-white/5 rounded-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 w-1 h-full" :class="referralStatus === 'valid' ? 'bg-emerald-500' : (referralStatus === 'invalid' ? 'bg-red-500' : 'bg-ag-purple')"></div>
-            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 pl-2">Kode Referal (Opsional)</label>
+            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 pl-2">Kode Referal Teman (Opsional)</label>
             <div class="relative pl-2">
               <input 
                 v-model="referralCode" 
@@ -114,6 +115,7 @@
               </p>
             </div>
           </div>
+
           <button type="submit" :disabled="isLoading" :class="tab === 'jemaat' ? 'from-ag-purple to-[#5b1d66] hover:shadow-[0_0_20px_rgba(124,40,137,0.4)] text-white' : 'from-ag-yellow to-[#e5c910] hover:shadow-[0_0_20px_rgba(253,224,33,0.4)] text-gray-900'" class="w-full mt-6 bg-gradient-to-r font-extrabold py-4 px-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] flex justify-center items-center disabled:opacity-50">
             <span v-if="isLoading">Memproses Data...</span>
             <span v-else>Daftar & Buat QR Code</span>
@@ -130,21 +132,24 @@
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
         </div>
         <h2 class="text-3xl font-extrabold text-white mb-2">Pendaftaran Berhasil!</h2>
-        <p class="text-gray-400 text-sm mb-8 px-4">
+        <p class="text-gray-400 text-sm mb-6 px-4">
           Ini adalah Kartu Jemaat Anda. Silakan unduh dan simpan di galeri HP Anda.
         </p>
 
-        <div class="flex flex-col items-center justify-center mb-8 relative">
+        <div class="flex flex-col items-center justify-center mb-6 relative">
           <div class="absolute inset-0 bg-gradient-to-r from-ag-purple/30 to-ag-yellow/30 blur-2xl rounded-full"></div>
           
           <div ref="qrContainer" class="relative p-5 bg-white rounded-2xl shadow-[0_0_50px_rgba(253,224,33,0.3)] border-4 border-white">
             <qrcode-vue :value="registeredData.qr_code_data" :size="220" level="H" />
           </div>
           
-          <div class="mt-5 bg-black/40 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-md">
-            <p class="text-xs text-gray-400 font-mono tracking-wider break-all text-center max-w-[250px]">
-              <span class="text-ag-yellow font-bold text-sm">{{ registeredData.fullname }}</span>
-            </p>
+          <div class="mt-5 bg-black/60 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-md shadow-lg flex flex-col items-center">
+            <p class="text-white font-bold text-lg mb-1">{{ registeredData.fullname }}</p>
+            <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg border border-white/5">
+              <span class="text-xs text-gray-400 font-medium uppercase tracking-wider">Kode Referal:</span>
+              <span class="text-ag-yellow font-black tracking-widest">@{{ registeredData.username }}</span>
+            </div>
+            <p class="text-[10px] text-gray-500 mt-2 font-medium">Bagikan kode ini untuk mendapat poin!</p>
           </div>
         </div>
 
@@ -177,21 +182,16 @@ const errorMessage = ref('')
 const isRegistered = ref(false)
 const registeredData = ref(null)
 
-// Referensi DOM untuk membungkus QR Code agar bisa di-download
 const qrContainer = ref(null)
 
-// ==========================================
-// STATE UNTUK KODE REFERAL
-// ==========================================
 const referralCode = ref('')
-const referralStatus = ref('idle') // Status: idle, loading, valid, invalid
+const referralStatus = ref('idle') 
 const referrerName = ref('')
 let debounceTimer = null
 
 const debounceCheckReferral = () => {
   clearTimeout(debounceTimer)
   
-  // Jika kotak referal kosong, kembalikan ke status awal
   if (!referralCode.value.trim()) {
     referralStatus.value = 'idle'
     referrerName.value = ''
@@ -200,10 +200,11 @@ const debounceCheckReferral = () => {
 
   referralStatus.value = 'loading'
   
-  // Tunggu 800ms setelah user berhenti mengetik sebelum menembak API
   debounceTimer = setTimeout(async () => {
     try {
-      const res = await axios.get(`https://semskii1-ag-connect-api.hf.space/users/check-referral/${referralCode.value.trim()}`)
+      // Hilangkan simbol @ jika user tidak sengaja mengetiknya
+      const cleanCode = referralCode.value.trim().replace('@', '')
+      const res = await axios.get(`https://semskii1-ag-connect-api.hf.space/users/check-referral/${cleanCode}`)
       referralStatus.value = 'valid'
       referrerName.value = res.data.fullname
     } catch (error) {
@@ -212,15 +213,14 @@ const debounceCheckReferral = () => {
     }
   }, 800)
 }
-// ==========================================
 
 const form = ref({
   fullname: '',
+  username: '', // [DIPERBAIKI]
   whatsapp: '',
   date_of_birth: '',
   pekerjaan: 'Siswa',
   pelayanan: 'Praise and Worship',
-  username: '', 
   password: '', 
   confirmPassword: '' 
 })
@@ -239,11 +239,10 @@ const handleRegister = async () => {
     }
   }
 
-  const safeName = form.value.fullname.toLowerCase().replace(/[^a-z0-9]/g, '')
-  const randomNum = Math.floor(100 + Math.random() * 900)
-  
-  const finalUsername = isUsher ? form.value.username : `${safeName}${randomNum}`
+  // [DIPERBAIKI] Gunakan input username dari form, bersihkan spasi agar aman
+  const finalUsername = form.value.username.toLowerCase().replace(/\s+/g, '')
   const finalPassword = isUsher ? form.value.password : 'default_ag_password_123!'
+  const cleanReferral = referralStatus.value === 'valid' ? referralCode.value.trim().replace('@', '') : null
 
   const payload = {
     fullname: form.value.fullname,
@@ -253,7 +252,7 @@ const handleRegister = async () => {
     date_of_birth: form.value.date_of_birth,
     status: tab.value === 'jemaat' ? form.value.pekerjaan : 'Pelayan Tuhan',
     talents: tab.value === 'pelayan' ? form.value.pelayanan : 'Jemaat Umum',
-    referred_by: referralStatus.value === 'valid' ? referralCode.value.trim() : null // [BARU] Sisipkan referal
+    referred_by: cleanReferral 
   }
 
   try {
@@ -271,26 +270,19 @@ const handleRegister = async () => {
   }
 }
 
-// FUNGSI BARU: MENGUNDUH QR CODE SEBAGAI GAMBAR
 const downloadQRCode = () => {
   if (!qrContainer.value) return
 
-  // Cari elemen <canvas> yang dihasilkan oleh komponen <qrcode-vue>
   const canvas = qrContainer.value.querySelector('canvas')
   
   if (canvas) {
-    // Ubah kanvas menjadi data URL gambar berformat PNG
     const imageUrl = canvas.toDataURL('image/png')
-    
-    // Buat tag <a> sementara di balik layar
     const downloadLink = document.createElement('a')
     downloadLink.href = imageUrl
     
-    // Bersihkan spasi dari nama user untuk dijadikan nama file (misal: Kartu_Samuel_Christian.png)
     const safeFilename = registeredData.value.fullname.replace(/\s+/g, '_')
     downloadLink.download = `Kartu_AG_${safeFilename}.png`
     
-    // Simulasikan klik untuk memicu unduhan, lalu hapus tag <a> tersebut
     document.body.appendChild(downloadLink)
     downloadLink.click()
     document.body.removeChild(downloadLink)
