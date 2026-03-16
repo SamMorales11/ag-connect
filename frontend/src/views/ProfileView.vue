@@ -138,25 +138,43 @@
         </div>
 
         <h3 class="text-2xl font-black text-white mb-2">Pilih Laporan</h3>
-        <p class="text-sm text-gray-400 mb-6">Tentukan rentang waktu data kehadiran yang ingin Anda unduh ke Excel.</p>
+        <p class="text-sm text-gray-400 mb-6">Tentukan spesifikasi data kehadiran yang ingin Anda unduh ke Excel.</p>
         
-        <div class="space-y-3 mb-6">
-          <button @click="exportFilter = 'today'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'today' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+        <div class="mb-4">
+          <label class="block text-left text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">1. Pilih Kategori</label>
+          <div class="relative bg-white/5 border border-white/10 rounded-xl overflow-hidden focus-within:border-emerald-500 transition-colors">
+            <select v-model="exportServiceType" class="w-full bg-transparent text-white font-bold text-sm px-4 py-3 appearance-none outline-none cursor-pointer">
+              <option value="Semua" class="bg-[#111] text-white">Semua Ibadah / Acara</option>
+              <option value="AG" class="bg-[#111] text-white">⛪ Ibadah AG (Utama)</option>
+              <option value="AG Lite" class="bg-[#111] text-white">🎸 Ibadah AG Lite</option>
+              <option value="Doa Fajar" class="bg-[#111] text-white">🌅 Doa Fajar</option>
+              <option value="Doa Pengerja" class="bg-[#111] text-white">🙏 Doa Pengerja</option>
+              <option value="AGC/Fellowship" class="bg-[#111] text-white">🤝 AGC / Fellowship</option>
+            </select>
+             <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 mb-6 text-left">
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 mt-2">2. Pilih Waktu</label>
+          <button @click="exportFilter = 'today'" class="w-full flex justify-between items-center px-4 py-2.5 rounded-xl border transition-all duration-300" :class="exportFilter === 'today' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
             <span class="font-bold text-sm">Hari Ini</span>
             <svg v-if="exportFilter === 'today'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           </button>
           
-          <button @click="exportFilter = 'week'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'week' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+          <button @click="exportFilter = 'week'" class="w-full flex justify-between items-center px-4 py-2.5 rounded-xl border transition-all duration-300" :class="exportFilter === 'week' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
             <span class="font-bold text-sm">7 Hari Terakhir</span>
             <svg v-if="exportFilter === 'week'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           </button>
           
-          <button @click="exportFilter = 'month'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'month' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+          <button @click="exportFilter = 'month'" class="w-full flex justify-between items-center px-4 py-2.5 rounded-xl border transition-all duration-300" :class="exportFilter === 'month' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
             <span class="font-bold text-sm">Bulan Ini</span>
             <svg v-if="exportFilter === 'month'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           </button>
 
-          <button @click="exportFilter = 'all'" class="w-full flex justify-between items-center px-4 py-3 rounded-xl border transition-all duration-300" :class="exportFilter === 'all' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
+          <button @click="exportFilter = 'all'" class="w-full flex justify-between items-center px-4 py-2.5 rounded-xl border transition-all duration-300" :class="exportFilter === 'all' ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'">
             <span class="font-bold text-sm">Semua Waktu</span>
             <svg v-if="exportFilter === 'all'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
           </button>
@@ -168,7 +186,7 @@
           </button>
           <button @click="downloadReport" :disabled="isExporting" class="flex-1 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center justify-center disabled:opacity-50">
             <svg v-if="isExporting" class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <span v-else>Unduh Sekarang</span>
+            <span v-else>Unduh CSV</span>
           </button>
         </div>
 
@@ -190,6 +208,7 @@ const isLoading = ref(true)
 
 const showExportModal = ref(false)
 const exportFilter = ref('today')
+const exportServiceType = ref('Semua') // [BARU] State penyimpan pilihan Kategori
 const isExporting = ref(false)
 
 onMounted(async () => {
@@ -218,9 +237,7 @@ onMounted(async () => {
 const goToScan = () => router.push('/scan')
 const goToDashboard = () => router.push('/dashboard')
 
-// --- [BARU & DIPERBAIKI] FUNGSI GENERATE KARTU ID DIGITAL E-SPORT ---
 const generateCardAndDownload = () => {
-  // 1. Ambil kanvas asli dari qrcode-vue menggunakan ID bungkusannya
   const qrContainer = document.getElementById('qr-canvas-container');
   const originalQrCanvas = qrContainer ? qrContainer.querySelector('canvas') : null;
 
@@ -229,74 +246,66 @@ const generateCardAndDownload = () => {
     return;
   }
 
-  // 2. Buat kanvas baru untuk ID Card utuh (800 x 1200 resolusi HD)
   const cardCanvas = document.createElement('canvas');
   cardCanvas.width = 800;
   cardCanvas.height = 1200;
   const ctx = cardCanvas.getContext('2d');
 
-  // 3. Gambar Latar Belakang (Gradien Ungu Gelap - Hitam Pekat)
   const gradient = ctx.createLinearGradient(0, 0, 800, 1200);
   gradient.addColorStop(0, '#1E1030'); 
   gradient.addColorStop(1, '#0A0A0A'); 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, 800, 1200);
 
-  // 4. Teks Judul
-  ctx.fillStyle = '#FDE047'; // Kuning AG
+  ctx.fillStyle = '#FDE047'; 
   ctx.font = '900 60px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('AG CONNECT', 400, 160);
 
-  ctx.fillStyle = '#D1D5DB'; // Abu-abu cerah
+  ctx.fillStyle = '#D1D5DB'; 
   ctx.font = 'bold 30px sans-serif';
   ctx.fillText('KARTU JEMAAT DIGITAL', 400, 220);
 
-  // 5. Kotak Putih & Menempelkan QR Code
   ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(200, 280, 400, 400); // Frame putih untuk QR
-  ctx.drawImage(originalQrCanvas, 220, 300, 360, 360); // Tempel QR dari layar
+  ctx.fillRect(200, 280, 400, 400); 
+  ctx.drawImage(originalQrCanvas, 220, 300, 360, 360); 
 
-  // 6. Nama Lengkap
   ctx.fillStyle = '#FFFFFF';
   ctx.font = '900 50px sans-serif';
   ctx.fillText(user.value.fullname.toUpperCase(), 400, 800);
 
-  // 7. Status Jemaat / Pelayan
-  ctx.fillStyle = '#A855F7'; // Ungu AG
+  ctx.fillStyle = '#A855F7'; 
   ctx.font = 'bold 35px sans-serif';
   ctx.fillText(user.value.status || 'Jemaat AG', 400, 860);
 
-  // 8. Kotak Info Kode Referal
   ctx.fillStyle = '#111111';
-  ctx.fillRect(150, 950, 500, 150); // Background kotak referal
-  ctx.strokeStyle = '#374151'; // Garis pinggir kotak
+  ctx.fillRect(150, 950, 500, 150); 
+  ctx.strokeStyle = '#374151'; 
   ctx.lineWidth = 4;
   ctx.strokeRect(150, 950, 500, 150); 
 
-  ctx.fillStyle = '#9CA3AF'; // Teks Abu-abu
+  ctx.fillStyle = '#9CA3AF'; 
   ctx.font = 'bold 22px sans-serif';
   ctx.fillText('KODE REFERAL SAYA:', 400, 1010);
 
-  ctx.fillStyle = '#10B981'; // Teks Hijau Menyala
+  ctx.fillStyle = '#10B981'; 
   ctx.font = '900 45px sans-serif';
   ctx.fillText('@' + user.value.username, 400, 1060);
 
-  // 9. Download Hasil Akhir
   const link = document.createElement('a');
-  link.download = `ID_Card_AG_${user.value.username}.png`; // Nama file sudah diubah!
+  link.download = `ID_Card_AG_${user.value.username}.png`; 
   link.href = cardCanvas.toDataURL('image/png', 1.0);
   link.click();
 }
 
-// -------------------------------------------------------------
-
+// --- [DIPERBARUI] FUNGSI UNDUH LAPORAN DENGAN FILTER KATEGORI ---
 const downloadReport = async () => {
   isExporting.value = true
   try {
     const token = localStorage.getItem('access_token')
     
-    const response = await axios.get(`https://semskii1-ag-connect-api.hf.space/export/attendances?filter=${exportFilter.value}`, {
+    // Menyertakan 2 parameter (filter & service_type) ke API
+    const response = await axios.get(`https://semskii1-ag-connect-api.hf.space/export/attendances?filter=${exportFilter.value}&service_type=${encodeURIComponent(exportServiceType.value)}`, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob' 
     })
@@ -305,11 +314,14 @@ const downloadReport = async () => {
     const link = document.createElement('a')
     link.href = url
     
-    const suffix = exportFilter.value === 'today' ? 'Hari_Ini' : 
+    // Format nama file agar rapi & jelas (Contoh: Laporan_Doa_Fajar_Bulan_Ini.csv)
+    const suffixTime = exportFilter.value === 'today' ? 'Hari_Ini' : 
                    exportFilter.value === 'week' ? '7_Hari_Terakhir' : 
-                   exportFilter.value === 'month' ? 'Bulan_Ini' : 'Semua'
+                   exportFilter.value === 'month' ? 'Bulan_Ini' : 'Semua_Waktu'
+                   
+    const suffixService = exportServiceType.value === 'Semua' ? 'Semua_Acara' : exportServiceType.value.replace(/\s+/g, '_').replace('/', '_')
 
-    link.setAttribute('download', `Laporan_Kehadiran_AG_${suffix}.csv`) 
+    link.setAttribute('download', `Laporan_${suffixService}_${suffixTime}.csv`) 
     
     document.body.appendChild(link)
     link.click() 

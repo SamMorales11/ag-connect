@@ -16,39 +16,33 @@
         </p>
       </div>
 
-      <div class="mb-6 w-full p-1 bg-white/5 border border-white/10 rounded-2xl flex backdrop-blur-md relative shadow-lg">
-        <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(0,0,0,0.5)]"
-             :class="selectedService === 'AG' ? 'left-1 bg-gradient-to-r from-ag-purple to-[#5b1d66]' : 'left-[calc(50%+3px)] bg-gradient-to-r from-ag-yellow to-[#e5c910]'">
+      <div class="mb-6 w-full relative group z-20">
+        <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 pl-2">Kategori Ibadah / Acara</label>
+        <div class="relative bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-hidden transition-all focus-within:border-ag-purple focus-within:shadow-[0_0_20px_rgba(168,85,247,0.3)] shadow-lg">
+          <select v-model="selectedService" class="w-full bg-transparent text-white font-bold text-sm px-5 py-4 appearance-none outline-none cursor-pointer">
+            <option value="AG" class="bg-[#111] text-white">⛪ Ibadah AG (Utama)</option>
+            <option value="AG Lite" class="bg-[#111] text-white">🎸 Ibadah AG Lite</option>
+            <option value="Doa Fajar" class="bg-[#111] text-white">🌅 Doa Fajar</option>
+            <option value="Doa Pengerja" class="bg-[#111] text-white">🙏 Doa Pengerja</option>
+            <option value="AGC/Fellowship" class="bg-[#111] text-white">🤝 AGC / Fellowship</option>
+          </select>
+          <div class="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
         </div>
-        
-        <button @click="selectedService = 'AG'" class="flex-1 py-3 text-sm font-bold z-10 transition-colors"
-                :class="selectedService === 'AG' ? 'text-white' : 'text-gray-400 hover:text-white'">
-          ⛪ Ibadah AG
-        </button>
-        <button @click="selectedService = 'AG Lite'" class="flex-1 py-3 text-sm font-bold z-10 transition-colors"
-                :class="selectedService === 'AG Lite' ? 'text-gray-900' : 'text-gray-400 hover:text-white'">
-          🎸 Ibadah AG Lite
-        </button>
       </div>
       
       <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col items-center relative overflow-hidden">
         
-        <div class="absolute top-8 right-8 z-30 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 text-xs font-bold uppercase tracking-widest text-white">
-          Mode: {{ selectedService }}
+        <div class="absolute top-8 right-8 z-30 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white">
+          {{ selectedService }}
         </div>
 
         <div class="relative w-full overflow-hidden rounded-2xl bg-black/60 border-2 border-dashed border-white/20 transition-all duration-300"
-             :class="{
-               'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]': statusType === 'success', 
-               'border-amber-500/50 shadow-[0_0_30px_rgba(245,158,11,0.2)]': statusType === 'warning',
-               'border-red-500/50 shadow-[0_0_30px_rgba(239,68,68,0.2)]': statusType === 'error'
-             }">
+             :class="{'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]': successMessage, 'border-red-500/50': errorMessage}">
           
           <div id="reader" class="w-full h-[300px] flex items-center justify-center relative z-10"></div>
-          
-          <div v-if="statusType === 'success'" class="absolute inset-0 bg-emerald-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
-          <div v-else-if="statusType === 'warning'" class="absolute inset-0 bg-amber-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
-          <div v-else-if="statusType === 'error'" class="absolute inset-0 bg-red-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
+          <div v-if="successMessage" class="absolute inset-0 bg-emerald-500/20 z-20 transition-all duration-300 pointer-events-none"></div>
         </div>
 
         <button @click="toggleCamera" :disabled="isProcessing" class="mt-6 flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-700 hover:to-gray-800 border border-gray-600 rounded-xl text-white font-bold text-sm transition-all shadow-lg transform active:scale-95 disabled:opacity-50">
@@ -57,17 +51,13 @@
         </button>
         
         <transition name="fade" mode="out-in">
-          <div v-if="statusType === 'success'" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md">
-            <p class="font-bold text-white text-lg mb-0.5">{{ statusTitle }}</p>
-            <p class="text-emerald-400 text-sm font-medium">{{ statusMessage }}</p>
+          <div v-if="successMessage" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md">
+            <p class="font-bold text-white text-lg mb-0.5">Berhasil!</p>
+            <p class="text-emerald-400 text-sm font-medium">{{ successMessage }}</p>
           </div>
-          <div v-else-if="statusType === 'warning'" class="w-full mt-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-center backdrop-blur-md">
-            <p class="font-bold text-white text-lg mb-0.5">{{ statusTitle }}</p>
-            <p class="text-amber-400 text-sm font-medium">{{ statusMessage }}</p>
-          </div>
-          <div v-else-if="statusType === 'error'" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md">
-            <p class="font-bold text-white text-lg mb-0.5">{{ statusTitle }}</p>
-            <p class="text-red-400 text-sm font-medium">{{ statusMessage }}</p>
+          <div v-else-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md">
+            <p class="font-bold text-white text-lg mb-0.5">Akses Ditolak</p>
+            <p class="text-red-400 text-sm font-medium">{{ errorMessage }}</p>
           </div>
         </transition>
 
@@ -91,17 +81,14 @@ import { Html5Qrcode } from 'html5-qrcode'
 import axios from 'axios'
 
 const router = useRouter()
-
-// Manajemen Notifikasi
-const statusType = ref('') // 'success', 'warning', 'error', atau ''
-const statusTitle = ref('')
-const statusMessage = ref('')
-
+const successMessage = ref('')
+const errorMessage = ref('')
 const isProcessing = ref(false)
 const isFrontCamera = ref(false) 
+
+// Variabel untuk menampung 5 pilihan Ibadah
 const selectedService = ref('AG') 
 
-// Logika Hak Akses
 const isAdmin = ref(false)
 const isUserLoaded = ref(false)
 
@@ -124,7 +111,6 @@ onMounted(async () => {
     router.push('/')
     return
   }
-  
   html5QrCode = new Html5Qrcode("reader")
   startCamera()
 })
@@ -148,9 +134,7 @@ const startCamera = async () => {
       onScanFailure
     )
   } catch (err) {
-    statusType.value = 'error'
-    statusTitle.value = 'Kamera Gagal'
-    statusMessage.value = 'Kamera tidak terdeteksi atau izin ditolak.'
+    errorMessage.value = "Kamera tidak terdeteksi atau izin ditolak."
   }
 }
 
@@ -169,44 +153,32 @@ const onScanSuccess = async (decodedText) => {
   if (isProcessing.value) return 
   
   isProcessing.value = true
-  statusType.value = ''
-  statusTitle.value = ''
-  statusMessage.value = ''
+  successMessage.value = ''
+  errorMessage.value = ''
 
   try {
     const response = await axios.post('https://semskii1-ag-connect-api.hf.space/scan', {
       qr_code_data: decodedText,
-      service_type: selectedService.value
+      service_type: selectedService.value // Akan mengirimkan nama acara yang dipilih di dropdown
     })
     
-    const msg = response.data.message
+    // Mesin tetap menggunakan logika gamifikasi yang sama: 
+    // Hanya absen pertama di hari itu yang mendapat +5 poin
+    const msg = response.data.message;
     const jamAbsen = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     
-    // Logika Pemisahan Warna Berdasarkan Balasan Backend
-    if (msg.includes('+5')) {
-      statusType.value = 'success'
-      statusTitle.value = 'Poin Bertambah! 🎉'
-      statusMessage.value = `${msg} pada ${jamAbsen}`
-    } else {
-      statusType.value = 'warning'
-      statusTitle.value = 'Hadir Tercatat ✅'
-      statusMessage.value = `${msg} pada ${jamAbsen}`
-    }
+    successMessage.value = `${msg} di ${selectedService.value} (${jamAbsen})`
     
   } catch (error) {
-    statusType.value = 'error'
-    statusTitle.value = 'Akses Ditolak ❌'
     if (error.response && error.response.status === 404) {
-      statusMessage.value = 'QR Code tidak terdaftar di sistem!'
+      errorMessage.value = 'QR Code tidak terdaftar di sistem!'
     } else {
-      statusMessage.value = 'Terjadi kesalahan jaringan atau server.'
+      errorMessage.value = 'Terjadi kesalahan jaringan atau server.'
     }
   } finally {
-    // Hilangkan notifikasi dan buka kunci scanner setelah 3 detik
     setTimeout(() => {
-      statusType.value = ''
-      statusTitle.value = ''
-      statusMessage.value = ''
+      successMessage.value = ''
+      errorMessage.value = ''
       isProcessing.value = false
     }, 3000)
   }

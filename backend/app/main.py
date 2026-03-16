@@ -11,7 +11,6 @@ from typing import List, Optional
 import csv
 from io import StringIO
 from fastapi.middleware.cors import CORSMiddleware
-# [REVISI] Tambahkan func dari sqlalchemy untuk ekstraksi tanggal
 from sqlalchemy import func 
 from . import models, schemas, database
 
@@ -53,14 +52,12 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     user = db.query(models.User).filter(models.User.username == username).first()
     return user
 
-# --- CEK REFERRAL ---
 @app.get("/users/check-referral/{username}")
 def check_referral(username: str, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.username == username.lower()).first()
     if not user: raise HTTPException(status_code=404)
     return {"valid": True, "fullname": user.fullname.split()[0]}
 
-# --- REGISTER DENGAN POIN ---
 @app.post("/register", response_model=schemas.UserResponse)
 def register_jemaat(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db.query(models.User).filter(models.User.username == user.username.lower()).first():
@@ -104,33 +101,31 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 def read_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
-# --- [REVISI] SCAN DENGAN LIMITASI POIN (MENGGUNAKAN FUNC.DATE) ---
 @app.post("/scan")
 def scan_attendance(request: schemas.AttendanceCreate, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.qr_code_data == request.qr_code_data).first()
     if not user: raise HTTPException(status_code=404, detail="QR Code tidak valid")
     
-    # 1. Dapatkan tanggal hari ini (UTC)
     today_date = datetime.utcnow().date()
     
-    # 2. Cek database: Apakah ada absensi user ini yang tanggalnya sama dengan hari ini?
-    # Menggunakan func.date() membuat perbandingan lebih kebal terhadap masalah zona waktu
     sudah_absen_hari_ini = db.query(models.Attendance).filter(
         models.Attendance.user_id == user.id,
         func.date(models.Attendance.scan_time) == today_date
     ).first()
 
     pesan_notifikasi = ""
+    layanan_tanpa_poin = ["Doa Fajar", "Doa Pengerja", "AGC/Fellowship"]
 
-    # 3. Logika Gamifikasi
-    if not sudah_absen_hari_ini:
-        user.points += 5
-        db.add(user)
-        pesan_notifikasi = "Berhasil! +5 Poin Gamifikasi"
+    if request.service_type in layanan_tanpa_poin:
+        pesan_notifikasi = "Hadir (Acara ini tidak mendapat Poin)"
     else:
-        pesan_notifikasi = "Kehadiran dicatat (Sudah mendapat poin hari ini)"
+        if not sudah_absen_hari_ini:
+            user.points += 5
+            db.add(user)
+            pesan_notifikasi = "Berhasil! +5 Poin Gamifikasi"
+        else:
+            pesan_notifikasi = "Kehadiran dicatat (Sudah mendapat poin hari ini)"
 
-    # 4. Tetap catat kehadirannya ke dalam log statistik
     new_attendance = models.Attendance(user_id=user.id, service_type=request.service_type)
     db.add(new_attendance)
     db.commit()
@@ -141,34 +136,27 @@ def scan_attendance(request: schemas.AttendanceCreate, db: Session = Depends(get
 def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
-# Endpoint ini wajib ada agar log absensi bisa ditarik oleh Dashboard Analitik
 @app.get("/attendance/logs")
 def get_attendance_logs(db: Session = Depends(get_db)):
     return db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
 
-# --- TAMBAH POIN KUIS (KHUSUS ADMIN) ---
 @app.post("/users/{user_id}/add-quiz-points")
 def add_quiz_points(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
-    # 1. Pastikan yang menekan tombol adalah Admin
     if not current_admin.is_admin:
         raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat memberikan poin kuis.")
     
-    # 2. Cari data jemaat yang akan diberi poin
     target_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not target_user:
         raise HTTPException(status_code=404, detail="Jemaat tidak ditemukan")
     
-    # 3. Tambahkan 10 Poin!
     target_user.points += 10
     db.add(target_user)
     db.commit()
     
     return {"message": f"🎉 10 Poin Kuis berhasil dikirim ke {target_user.fullname}!"}
 
-# --- [BARU] FUNGSI HAPUS JEMAAT (KHUSUS ADMIN) ---
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
-    # Verifikasi akses admin
     if not current_admin.is_admin:
         raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat menghapus data.")
         
@@ -180,10 +168,8 @@ def delete_user(user_id: int, db: Session = Depends(get_db), current_admin: mode
     db.commit()
     return {"message": "Data jemaat berhasil dihapus"}
 
-# --- [BARU] FUNGSI PROMOSI JEMAAT MENJADI ADMIN (KHUSUS ADMIN) ---
 @app.put("/users/{user_id}/promote")
 def promote_user(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
-    # Verifikasi akses admin
     if not current_admin.is_admin:
         raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat melakukan promosi.")
         
@@ -195,3 +181,51 @@ def promote_user(user_id: int, db: Session = Depends(get_db), current_admin: mod
     db.add(user)
     db.commit()
     return {"message": "Jemaat berhasil diangkat menjadi Admin"}
+
+@app.get("/export/attendances")
+def export_attendances(filter: str = 'all', service_type: str = 'Semua', db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat mengekspor laporan.")
+    
+    query = db.query(models.Attendance).options(joinedload(models.Attendance.user))
+    
+    if service_type != 'Semua':
+        query = query.filter(models.Attendance.service_type == service_type)
+        
+    now = datetime.utcnow()
+    if filter == 'today':
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        query = query.filter(models.Attendance.scan_time >= today_start)
+    elif filter == 'week':
+        week_start = now - timedelta(days=7)
+        query = query.filter(models.Attendance.scan_time >= week_start)
+    elif filter == 'month':
+        month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        query = query.filter(models.Attendance.scan_time >= month_start)
+        
+    logs = query.order_by(models.Attendance.scan_time.desc()).all()
+    
+    si = StringIO()
+    cw = csv.writer(si)
+    cw.writerow(["Tanggal & Waktu", "Nama Jemaat", "Kategori Jemaat", "Jenis Ibadah"]) 
+    
+    for log in logs:
+        waktu = log.scan_time.strftime("%Y-%m-%d %H:%M:%S") if log.scan_time else "-"
+        nama = log.user.fullname if log.user else "User Dihapus"
+        kategori = log.user.status if log.user else "-"
+        ibadah = log.service_type if log.service_type else "AG"
+        cw.writerow([waktu, nama, kategori, ibadah])
+        
+    return Response(content=si.getvalue(), media_type="text/csv")
+
+# --- [BARU] FUNGSI RESET SELURUH POIN (KHUSUS ADMIN) ---
+@app.put("/users/reset-points")
+def reset_all_points(db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat mereset poin.")
+    
+    # Update nilai kolom 'points' menjadi 0 untuk semua baris di tabel User
+    db.query(models.User).update({models.User.points: 0}, synchronize_session=False)
+    db.commit()
+    
+    return {"message": "Semua poin jemaat berhasil direset ke 0! Musim baru siap dimulai."}
