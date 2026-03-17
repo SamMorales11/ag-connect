@@ -88,7 +88,7 @@
               >
             </div>
 
-            <button @click="showResetModal = true" class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center justify-center gap-2">
+            <button v-if="activeTab === 'Leaderboard'" @click="showResetModal = true" class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center justify-center gap-2">
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
               <span class="whitespace-nowrap">Reset Poin</span>
             </button>
@@ -104,59 +104,81 @@
             </div>
 
             <div v-else v-for="(user, index) in paginatedUsers" :key="user.id"
-                 class="relative group flex flex-col sm:flex-row items-center justify-between p-4 sm:p-5 rounded-2xl transition-all duration-300 overflow-hidden backdrop-blur-md"
+                 class="relative group flex flex-col p-4 sm:p-5 rounded-2xl transition-all duration-500 overflow-hidden backdrop-blur-md"
                  :class="{
-                   'bg-gradient-to-r from-yellow-500/10 via-black/40 to-black/40 border border-yellow-500/50 shadow-[0_0_30px_rgba(234,179,8,0.15)] transform hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)]': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
-                   'bg-gradient-to-r from-gray-400/10 via-black/40 to-black/40 border border-gray-400/50 shadow-[0_0_30px_rgba(156,163,175,0.1)] transform hover:-translate-y-1': (currentPage - 1) * itemsPerPage + index === 1 && user.points > 0,
-                   'bg-gradient-to-r from-orange-600/10 via-black/40 to-black/40 border border-orange-600/50 shadow-[0_0_30px_rgba(234,88,12,0.1)] transform hover:-translate-y-1': (currentPage - 1) * itemsPerPage + index === 2 && user.points > 0,
-                   'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/30 transform hover:-translate-y-1': (currentPage - 1) * itemsPerPage + index > 2 || user.points === 0
+                   'border border-yellow-500/50 shadow-[0_0_30px_rgba(234,179,8,0.15)] bg-gradient-to-r from-yellow-900/40 to-[#0A0A0A] transform hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(234,179,8,0.3)] z-30': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
+                   'border border-gray-400/50 shadow-[0_0_30px_rgba(156,163,175,0.1)] bg-gradient-to-r from-gray-800/60 to-[#0A0A0A] transform hover:-translate-y-1 z-20': (currentPage - 1) * itemsPerPage + index === 1 && user.points > 0,
+                   'border border-orange-600/50 shadow-[0_0_30px_rgba(234,88,12,0.1)] bg-gradient-to-r from-orange-900/40 to-[#0A0A0A] transform hover:-translate-y-1 z-10': (currentPage - 1) * itemsPerPage + index === 2 && user.points > 0,
+                   'border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transform hover:-translate-y-1': (currentPage - 1) * itemsPerPage + index > 2 || user.points === 0
                  }">
 
-              <div class="flex items-center gap-4 w-full sm:w-auto mb-4 sm:mb-0">
-                <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-black text-lg relative"
-                     :class="{
-                       'bg-gradient-to-br from-yellow-400 to-yellow-600 text-gray-900 shadow-[0_0_20px_rgba(250,204,21,0.5)]': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
-                       'bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 shadow-[0_0_20px_rgba(156,163,175,0.4)]': (currentPage - 1) * itemsPerPage + index === 1 && user.points > 0,
-                       'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]': (currentPage - 1) * itemsPerPage + index === 2 && user.points > 0,
-                       'bg-black/50 text-gray-400 border border-gray-600': (currentPage - 1) * itemsPerPage + index > 2 || user.points === 0
-                     }">
-                  <span v-if="(currentPage - 1) * itemsPerPage + index === 0 && user.points > 0" class="absolute -top-3 text-2xl drop-shadow-md">👑</span>
-                  {{ (currentPage - 1) * itemsPerPage + index + 1 }}
-                </div>
+              <div v-if="(currentPage - 1) * itemsPerPage + index === 0 && user.points > 0" class="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
-                <div class="hidden md:flex w-12 h-12 rounded-full border border-white/10 bg-black/50 items-center justify-center font-black text-lg text-transparent bg-clip-text bg-gradient-to-br from-ag-yellow to-ag-purple">
-                  {{ user.fullname.charAt(0).toUpperCase() }}
-                </div>
-
-                <div>
-                  <h3 class="text-lg font-black text-white leading-tight group-hover:text-ag-yellow transition-colors flex items-center gap-2">
-                    {{ user.fullname }}
-                    <span v-if="(currentPage - 1) * itemsPerPage + index === 0 && user.points > 0" class="text-[10px] font-black px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded-md border border-yellow-500/30 uppercase tracking-widest">MVP</span>
-                  </h3>
-                  <p class="text-xs font-mono text-gray-500 mt-0.5">@{{ user.username }}</p>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 md:gap-8">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full relative z-10 gap-4">
                 
-                <div class="flex flex-col items-start sm:items-end">
-                  <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Poin</span>
-                  <div class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border transition-all"
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                  <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-black text-lg relative"
                        :class="{
-                         'bg-yellow-500/10 border-yellow-500/30 text-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.2)]': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
-                         'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]': ((currentPage - 1) * itemsPerPage + index > 0) || user.points === 0
+                         'bg-gradient-to-br from-yellow-400 to-yellow-600 text-gray-900 shadow-[0_0_20px_rgba(250,204,21,0.5)] ring-4 ring-yellow-500/30': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
+                         'bg-gradient-to-br from-gray-300 to-gray-500 text-gray-900 shadow-[0_0_20px_rgba(156,163,175,0.4)] ring-2 ring-gray-400/30': (currentPage - 1) * itemsPerPage + index === 1 && user.points > 0,
+                         'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)] ring-2 ring-orange-500/30': (currentPage - 1) * itemsPerPage + index === 2 && user.points > 0,
+                         'bg-black/50 text-gray-400 border border-gray-600': (currentPage - 1) * itemsPerPage + index > 2 || user.points === 0
                        }">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <span class="font-black text-xl">{{ user.points }}</span>
+                    <span v-if="(currentPage - 1) * itemsPerPage + index === 0 && user.points > 0" class="absolute -top-4 text-2xl drop-shadow-md animate-bounce">👑</span>
+                    {{ (currentPage - 1) * itemsPerPage + index + 1 }}
+                  </div>
+
+                  <div class="hidden md:flex w-12 h-12 rounded-full bg-black/50 items-center justify-center font-black text-lg text-transparent bg-clip-text bg-gradient-to-br from-ag-yellow to-ag-purple"
+                       :class="{
+                         'border-2 border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.4)]': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
+                         'border border-white/10': !((currentPage - 1) * itemsPerPage + index === 0 && user.points > 0)
+                       }">
+                    {{ user.fullname.charAt(0).toUpperCase() }}
+                  </div>
+
+                  <div>
+                    <h3 class="text-lg font-black text-white leading-tight group-hover:text-ag-yellow transition-colors flex items-center gap-2">
+                      {{ user.fullname }}
+                      <span v-if="(currentPage - 1) * itemsPerPage + index === 0 && user.points > 0" class="text-[10px] font-black px-2 py-0.5 bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900 rounded-md shadow-lg uppercase tracking-widest">MVP</span>
+                    </h3>
+                    <p class="text-xs font-mono text-gray-500 mt-0.5">@{{ user.username }}</p>
                   </div>
                 </div>
 
-                <button @click="openConfirmModal(user)" class="shrink-0 flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-gradient-to-r from-ag-purple to-purple-600 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)] transform hover:scale-105 transition-all focus:ring-2 focus:ring-purple-400 outline-none">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                  <span class="hidden sm:inline">+10 Kuis</span>
-                </button>
+                <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-8">
+                  
+                  <div class="flex flex-col items-start sm:items-end">
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Total Poin</span>
+                    <div class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl border transition-all"
+                         :class="{
+                           'bg-yellow-500/10 border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.4)]': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
+                           'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]': ((currentPage - 1) * itemsPerPage + index > 0) || user.points === 0
+                         }">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                      <span class="font-black text-xl">{{ user.points }}</span>
+                    </div>
+                  </div>
 
+                  <button @click="openConfirmModal(user)" class="shrink-0 flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-gradient-to-r from-ag-purple to-purple-600 hover:from-purple-500 hover:to-purple-400 text-white text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)] transform hover:scale-105 transition-all focus:ring-2 focus:ring-purple-400 outline-none">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                    <span class="hidden sm:inline">+10 Kuis</span>
+                  </button>
+
+                </div>
               </div>
+
+              <div class="w-full mt-4 bg-black/50 rounded-full h-1.5 overflow-hidden border border-white/5 relative z-10">
+                <div class="h-full rounded-full transition-all duration-1000 ease-out"
+                     :class="{
+                       'bg-gradient-to-r from-yellow-300 to-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.8)]': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
+                       'bg-gradient-to-r from-gray-300 to-gray-500': (currentPage - 1) * itemsPerPage + index === 1 && user.points > 0,
+                       'bg-gradient-to-r from-orange-400 to-orange-600': (currentPage - 1) * itemsPerPage + index === 2 && user.points > 0,
+                       'bg-gradient-to-r from-emerald-400 to-emerald-600': (currentPage - 1) * itemsPerPage + index > 2 || user.points === 0
+                     }"
+                     :style="{ width: `${(user.points / maxLeaderboardPoints) * 100}%` }">
+                </div>
+              </div>
+
             </div>
 
           </div>
@@ -386,6 +408,11 @@ const filteredUsers = computed(() => {
   return users
 })
 
+const maxLeaderboardPoints = computed(() => {
+  if (filteredUsers.value.length === 0) return 1;
+  return Math.max(filteredUsers.value[0].points, 1);
+})
+
 const getFilteredLogs = (type) => {
   let logs = allLogs.value.filter(log => log.service_type === type).sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time))
   
@@ -488,7 +515,6 @@ const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
   opacity: 1;
 }
 
-/* CSS KHUSUS UNTUK MENYEMBUNYIKAN SCROLLBAR DI MENU TABS */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }

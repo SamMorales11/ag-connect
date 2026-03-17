@@ -10,7 +10,12 @@
         
         <nav class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10 text-sm font-bold text-gray-300 tracking-wide">
           <button @click="$router.push('/')" class="text-white hover:text-ag-yellow transition-colors">Home</button>
-          <button @click="$router.push('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)] hover:scale-105">🏆 Leaderboard</button>
+          
+          <button @click="$router.push('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)] hover:scale-105">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            Klasemen
+          </button>
+          
           <button @click="scrollToFooter" class="hover:text-ag-purple transition-colors">Kontak</button>
         </nav>
 
@@ -38,7 +43,12 @@
       <transition name="slide-down">
         <div v-if="isMobileMenuOpen" class="md:hidden absolute top-full left-0 w-full bg-[#0A0A0A]/95 backdrop-blur-2xl border-b border-white/10 flex flex-col items-center py-6 gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.8)] z-50">
           <button @click="navigateMobile('/')" class="text-white hover:text-ag-yellow font-bold text-lg transition-colors tracking-wide">Home</button>
-          <button @click="navigateMobile('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black text-lg transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">🏆 Leaderboard</button>
+          
+          <button @click="navigateMobile('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black text-lg transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            Klasemen
+          </button>
+          
           <button @click="handleMobileContact" class="text-gray-300 hover:text-ag-purple font-bold text-lg transition-colors tracking-wide">Kontak</button>
           <div class="w-1/3 h-px bg-white/10 my-1"></div>
           <button @click="navigateMobile('/login')" class="text-gray-400 hover:text-white font-bold text-sm transition-colors flex items-center gap-2">
@@ -163,7 +173,6 @@ import axios from 'axios'
 
 const router = useRouter()
 
-// [BARU] Logika untuk Hamburger Menu di Mobile
 const isMobileMenuOpen = ref(false)
 
 const toggleMobileMenu = () => {
@@ -179,7 +188,6 @@ const handleMobileContact = () => {
   isMobileMenuOpen.value = false
   scrollToFooter()
 }
-// ------------------------------------------
 
 const scrollToFooter = () => {
   const footer = document.getElementById('footer-section')
@@ -245,7 +253,6 @@ const handleUsherLogin = async () => {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Animasi khusus untuk Menu Dropdown Mobile */
 .slide-down-enter-active, .slide-down-leave-active {
   transition: all 0.3s ease-out;
 }

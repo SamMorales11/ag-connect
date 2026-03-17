@@ -7,10 +7,14 @@
       
       <div class="text-center mb-16 animate-fade-in-up">
         <div class="inline-flex items-center justify-center p-2 bg-white/5 rounded-2xl mb-4 border border-white/10 backdrop-blur-sm">
-          <span class="px-4 py-1.5 bg-gradient-to-r from-ag-yellow to-ag-purple rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-lg">AG Connect Season 1</span>
+          <span class="px-4 py-1.5 bg-gradient-to-r from-ag-yellow to-ag-purple rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-lg flex items-center gap-2">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            AG Connect Season 1
+          </span>
         </div>
+        
         <h1 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500 tracking-tight mb-4 drop-shadow-2xl">
-          HALL OF <span class="text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-yellow-500">FAME</span>
+          KLASEMEN <span class="text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-yellow-500">UTAMA</span>
         </h1>
         <p class="text-gray-400 text-sm md:text-base font-medium max-w-xl mx-auto">
           Peringkat jemaat paling aktif beribadah dan membawa jiwa baru. Kumpulkan poin dan jadilah yang teratas!
@@ -41,8 +45,10 @@
             </div>
           </div>
 
-          <div v-if="topUsers[0]" class="flex flex-col items-center w-32 md:w-44 animate-fade-in-up z-20">
-            <div class="absolute -top-10 text-4xl animate-bounce">👑</div>
+          <div v-if="topUsers[0]" class="flex flex-col items-center w-32 md:w-44 animate-fade-in-up z-20 relative">
+            <div class="absolute -top-12 animate-bounce">
+              <svg class="w-10 h-10 text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"></path></svg>
+            </div>
             <div class="w-20 h-20 md:w-28 md:h-28 bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 rounded-full flex items-center justify-center text-4xl font-black text-gray-900 border-4 border-yellow-400 shadow-[0_0_50px_rgba(234,179,8,0.5)] relative z-10 -mb-8">
               {{ topUsers[0].fullname.charAt(0).toUpperCase() }}
             </div>
@@ -97,7 +103,7 @@
       </div>
       
       <div v-else class="text-center py-20 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-md">
-        <div class="text-6xl mb-4">🌪️</div>
+        <svg class="w-20 h-20 text-gray-600 mx-auto mb-6 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
         <h3 class="text-xl font-bold text-white mb-2">Arena Masih Sepi</h3>
         <p class="text-gray-400 text-sm">Jadilah yang pertama mendapatkan poin dan puncaki klasemen!</p>
       </div>
@@ -115,8 +121,6 @@ const allUsers = ref([])
 
 onMounted(async () => {
   try {
-    // Karena ini halaman publik, kita coba fetch tanpa token (jika backend mengizinkan)
-    // Atau jika backend Anda mengharuskan token, endpoint ini mungkin perlu disesuaikan di backend nanti
     const res = await axios.get('https://semskii1-ag-connect-api.hf.space/users')
     allUsers.value = res.data
   } catch (error) {
@@ -126,17 +130,13 @@ onMounted(async () => {
   }
 })
 
-// Menyaring dan mengurutkan user berdasarkan poin
 const sortedUsers = computed(() => {
   return [...allUsers.value]
-    .filter(u => u.points > 0) // Hanya tampilkan yang punya poin
-    .sort((a, b) => b.points - a.points) // Urutkan dari tertinggi
+    .filter(u => u.points > 0) 
+    .sort((a, b) => b.points - a.points) 
 })
 
-// Memisahkan Top 3 untuk Podium
 const topUsers = computed(() => sortedUsers.value.slice(0, 3))
-
-// Memisahkan Peringkat 4-10 untuk Daftar Bawah
 const otherUsers = computed(() => sortedUsers.value.slice(3, 10))
 
 </script>

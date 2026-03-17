@@ -12,12 +12,20 @@
         </div>
 
         <div class="flex p-1 mb-8 bg-black/40 rounded-xl border border-white/10">
-          <button @click="tab = 'jemaat'" :class="tab === 'jemaat' ? 'bg-gradient-to-r from-ag-purple to-[#5b1d66] text-white shadow-lg' : 'text-gray-400 hover:text-white'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300">👤 Jemaat Umum</button>
-          <button @click="tab = 'pelayan'" :class="tab === 'pelayan' ? 'bg-gradient-to-r from-ag-yellow to-[#e5c910] text-gray-900 shadow-lg' : 'text-gray-400 hover:text-white'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300">🎸 Pelayan Tuhan</button>
+          <button @click="tab = 'jemaat'" :class="tab === 'jemaat' ? 'bg-gradient-to-r from-ag-purple to-[#5b1d66] text-white shadow-[0_0_15px_rgba(124,40,137,0.4)]' : 'text-gray-400 hover:text-white'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            Jemaat Umum
+          </button>
+          
+          <button @click="tab = 'pelayan'" :class="tab === 'pelayan' ? 'bg-gradient-to-r from-ag-yellow to-[#e5c910] text-gray-900 shadow-[0_0_15px_rgba(253,224,33,0.4)]' : 'text-gray-400 hover:text-white'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path></svg>
+            Pelayan Tuhan
+          </button>
         </div>
 
-        <div v-if="errorMessage" class="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-xl text-sm text-center backdrop-blur-sm">
-          ❌ {{ errorMessage }}
+        <div v-if="errorMessage" class="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-400 rounded-xl text-sm text-center backdrop-blur-sm flex items-center justify-center gap-2">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>{{ errorMessage }}</span>
         </div>
 
         <form @submit.prevent="handleRegister" class="space-y-5">
@@ -202,7 +210,6 @@ const debounceCheckReferral = () => {
   
   debounceTimer = setTimeout(async () => {
     try {
-      // Hilangkan simbol @ dan jadikan huruf kecil
       const cleanCode = referralCode.value.trim().toLowerCase().replace('@', '')
       const res = await axios.get(`https://semskii1-ag-connect-api.hf.space/users/check-referral/${cleanCode}`)
       referralStatus.value = 'valid'

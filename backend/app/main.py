@@ -182,6 +182,17 @@ def promote_user(user_id: int, db: Session = Depends(get_db), current_admin: mod
     db.commit()
     return {"message": "Jemaat berhasil diangkat menjadi Admin"}
 
+@app.put("/users/reset-points")
+def reset_all_points(db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat mereset poin.")
+    
+    db.query(models.User).update({models.User.points: 0}, synchronize_session=False)
+    db.commit()
+    
+    return {"message": "Semua poin jemaat berhasil direset ke 0! Musim baru siap dimulai."}
+
+# --- [MAHAKARYA BARU] FUNGSI EXPORT DATA BENTUK MATRIKS DENGAN AUTO-FORMAT EXCEL ---
 @app.get("/export/attendances")
 def export_attendances(filter: str = 'all', service_type: str = 'Semua', db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
     if not current_admin.is_admin:
@@ -203,29 +214,55 @@ def export_attendances(filter: str = 'all', service_type: str = 'Semua', db: Ses
         month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         query = query.filter(models.Attendance.scan_time >= month_start)
         
-    logs = query.order_by(models.Attendance.scan_time.desc()).all()
+    # Ambil log yang sudah difilter
+    logs = query.order_by(models.Attendance.scan_time.asc()).all()
     
     si = StringIO()
-    cw = csv.writer(si)
-    cw.writerow(["Tanggal & Waktu", "Nama Jemaat", "Kategori Jemaat", "Jenis Ibadah"]) 
     
-    for log in logs:
-        waktu = log.scan_time.strftime("%Y-%m-%d %H:%M:%S") if log.scan_time else "-"
-        nama = log.user.fullname if log.user else "User Dihapus"
-        kategori = log.user.status if log.user else "-"
-        ibadah = log.service_type if log.service_type else "AG"
-        cw.writerow([waktu, nama, kategori, ibadah])
-        
-    return Response(content=si.getvalue(), media_type="text/csv")
+    # [TRIK RAHASIA] Memaksa Excel membaca koma sebagai pemisah kolom secara otomatis
+    si.write("sep=,\n")
+    
+    cw = csv.writer(si, delimiter=',')
+    
+    if not logs:
+        cw.writerow(["Tidak ada data kehadiran untuk kriteria ini."])
+        # Tambahkan BOM agar karakter terbaca sempurna oleh Excel
+        return Response(content='\ufeff' + si.getvalue(), media_type="text/csv")
 
-# --- [BARU] FUNGSI RESET SELURUH POIN (KHUSUS ADMIN) ---
-@app.put("/users/reset-points")
-def reset_all_points(db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
-    if not current_admin.is_admin:
-        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat mereset poin.")
+    # 1. Temukan Tanggal Unik (Untuk dijadikan Kolom ke kanan)
+    unique_dates = sorted(list(set(log.scan_time.date() for log in logs)))
+    date_headers = [d.strftime("%d %b %Y") for d in unique_dates]
     
-    # Update nilai kolom 'points' menjadi 0 untuk semua baris di tabel User
-    db.query(models.User).update({models.User.points: 0}, synchronize_session=False)
-    db.commit()
+    # 2. Buat Header Tabel (Pojok Kiri)
+    headers = ["Nama Jemaat", "Kategori", "Total Hadir"] + date_headers
+    cw.writerow(headers)
     
-    return {"message": "Semua poin jemaat berhasil direset ke 0! Musim baru siap dimulai."}
+    # 3. Kelompokkan data absensi berdasarkan ID Jemaat
+    attendance_map = {}
+    for log in logs:
+        if log.user_id not in attendance_map:
+            attendance_map[log.user_id] = set()
+        attendance_map[log.user_id].add(log.scan_time.date())
+        
+    # 4. Tampilkan semua Jemaat yang terdaftar di sistem
+    all_users = db.query(models.User).order_by(models.User.fullname).all()
+    
+    for user in all_users:
+        user_dates_present = attendance_map.get(user.id, set())
+        
+        # Susun baris awal: Nama, Kategori, Total Hadir
+        kategori_user = user.status if user.status else "-"
+        row = [user.fullname, kategori_user, len(user_dates_present)]
+        
+        # Beri tanda "v" jika hadir di tanggal tersebut, "-" jika absen
+        for d in unique_dates:
+            if d in user_dates_present:
+                row.append("v") # Hadir
+            else:
+                row.append("-") # Tidak Hadir
+                
+        cw.writerow(row)
+        
+    # Gabungkan BOM (\ufeff) dengan isi CSV agar Excel tidak salah membaca format
+    output_string = '\ufeff' + si.getvalue()
+    return Response(content=output_string, media_type="text/csv")
