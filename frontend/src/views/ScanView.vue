@@ -16,23 +16,42 @@
         </p>
       </div>
 
-      <div class="mb-6 w-full relative group z-20">
+      <div class="mb-6 w-full relative group z-30">
         <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 pl-2">Kategori Ibadah / Acara</label>
-        <div class="relative bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md overflow-hidden transition-all focus-within:border-ag-purple focus-within:shadow-[0_0_20px_rgba(168,85,247,0.3)] shadow-lg">
-          <select v-model="selectedService" class="w-full bg-transparent text-white font-bold text-sm px-5 py-4 appearance-none outline-none cursor-pointer">
-            <option value="AG" class="bg-[#111] text-white">⛪ Ibadah AG (Utama)</option>
-            <option value="AG Lite" class="bg-[#111] text-white">🎸 Ibadah AG Lite</option>
-            <option value="Doa Fajar" class="bg-[#111] text-white">🌅 Doa Fajar</option>
-            <option value="Doa Pengerja" class="bg-[#111] text-white">🙏 Doa Pengerja</option>
-            <option value="AGC/Fellowship" class="bg-[#111] text-white">🤝 AGC / Fellowship</option>
-          </select>
-          <div class="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-white transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        
+        <div class="relative w-full z-50">
+          <div v-if="isDropdownOpen" @click="isDropdownOpen = false" class="fixed inset-0 z-40"></div>
+
+          <div 
+            @click="isDropdownOpen = !isDropdownOpen"
+            class="relative z-50 bg-white/5 border rounded-2xl backdrop-blur-md overflow-hidden transition-all cursor-pointer flex items-center justify-between px-5 py-4 shadow-lg hover:border-ag-purple hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+            :class="isDropdownOpen ? 'border-ag-purple shadow-[0_0_20px_rgba(168,85,247,0.3)]' : 'border-white/10'"
+          >
+            <div class="flex items-center gap-3 text-white font-bold text-sm">
+              <div v-html="selectedOption.icon" class="w-5 h-5 text-ag-purple"></div>
+              {{ selectedOption.label }}
+            </div>
+            <svg class="w-5 h-5 text-gray-400 transition-transform duration-300" :class="{'rotate-180': isDropdownOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
           </div>
+
+          <transition name="slide-down">
+            <div v-if="isDropdownOpen" class="absolute top-full left-0 w-full mt-2 bg-[#111]/95 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.8)] z-50">
+              <div 
+                v-for="option in serviceOptions" 
+                :key="option.value"
+                @click="selectService(option)"
+                class="flex items-center gap-3 px-5 py-3.5 hover:bg-white/10 cursor-pointer transition-colors"
+                :class="{'bg-white/5': selectedService === option.value}"
+              >
+                <div v-html="option.icon" class="w-5 h-5" :class="selectedService === option.value ? 'text-ag-yellow' : 'text-gray-400'"></div>
+                <span class="text-sm font-bold" :class="selectedService === option.value ? 'text-ag-yellow' : 'text-gray-300'">{{ option.label }}</span>
+              </div>
+            </div>
+          </transition>
         </div>
       </div>
       
-      <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col items-center relative overflow-hidden">
+      <div class="w-full bg-white/5 backdrop-blur-2xl border border-white/10 p-6 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col items-center relative overflow-hidden z-10">
         
         <div class="absolute top-8 right-8 z-30 px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white">
           {{ selectedService }}
@@ -75,7 +94,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Html5Qrcode } from 'html5-qrcode'
 import axios from 'axios'
@@ -86,8 +105,27 @@ const errorMessage = ref('')
 const isProcessing = ref(false)
 const isFrontCamera = ref(false) 
 
-// Variabel untuk menampung 5 pilihan Ibadah
+// [BARU] Setup Custom Dropdown dengan Ikon SVG
+const isDropdownOpen = ref(false)
 const selectedService = ref('AG') 
+
+const serviceOptions = [
+  { value: 'AG', label: 'Ibadah AG (Utama)', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>' },
+  { value: 'AG Lite', label: 'Ibadah AG Lite', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>' },
+  { value: 'Doa Fajar', label: 'Doa Fajar', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>' },
+  { value: 'Doa Pengerja', label: 'Doa Pengerja', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>' },
+  { value: 'AGC/Fellowship', label: 'AGC / Fellowship', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>' }
+]
+
+const selectedOption = computed(() => {
+  return serviceOptions.find(opt => opt.value === selectedService.value) || serviceOptions[0]
+})
+
+const selectService = (option) => {
+  selectedService.value = option.value
+  isDropdownOpen.value = false
+}
+// ------------------------------------------
 
 const isAdmin = ref(false)
 const isUserLoaded = ref(false)
@@ -159,11 +197,9 @@ const onScanSuccess = async (decodedText) => {
   try {
     const response = await axios.post('https://semskii1-ag-connect-api.hf.space/scan', {
       qr_code_data: decodedText,
-      service_type: selectedService.value // Akan mengirimkan nama acara yang dipilih di dropdown
+      service_type: selectedService.value
     })
     
-    // Mesin tetap menggunakan logika gamifikasi yang sama: 
-    // Hanya absen pertama di hari itu yang mendapat +5 poin
     const msg = response.data.message;
     const jamAbsen = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     
@@ -206,4 +242,13 @@ const goBack = () => {
 #reader img { display: none !important; }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease, transform 0.5s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-10px); }
+
+/* Animasi untuk Menu Dropdown Custom */
+.slide-down-enter-active, .slide-down-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide-down-enter-from, .slide-down-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.98);
+}
 </style>
