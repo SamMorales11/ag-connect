@@ -4,6 +4,30 @@
     <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-ag-purple rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-ag-yellow rounded-full mix-blend-screen filter blur-[150px] opacity-10"></div>
 
+    <transition name="pop-bounce">
+      <div v-if="showWelcomePopup" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="bg-[#0A0A0A] border border-white/10 p-8 rounded-[2rem] shadow-[0_0_80px_rgba(16,185,129,0.2)] w-full max-w-sm text-center relative overflow-hidden">
+          
+          <div class="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-emerald-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+          <div class="relative z-10">
+            <div class="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center mb-5 border-4 border-[#0A0A0A] outline outline-2 outline-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.5)]">
+              <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            
+            <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Welcome</h2>
+            <p class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 mb-5 uppercase tracking-tight drop-shadow-lg leading-none">
+              {{ scannedUserFullname.split(' ')[0] }}
+            </p>
+            
+            <div class="inline-block bg-emerald-500/10 border border-emerald-500/20 px-5 py-2.5 rounded-xl backdrop-blur-sm">
+              <p class="text-emerald-400 text-xs font-bold tracking-widest uppercase">Selamat Beribadah!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <div class="w-full max-w-md relative z-10 flex flex-col items-center">
       
       <div class="text-center mb-6">
@@ -70,11 +94,7 @@
         </button>
         
         <transition name="fade" mode="out-in">
-          <div v-if="successMessage" class="w-full mt-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center backdrop-blur-md">
-            <p class="font-bold text-white text-lg mb-0.5">Berhasil!</p>
-            <p class="text-emerald-400 text-sm font-medium">{{ successMessage }}</p>
-          </div>
-          <div v-else-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md">
+          <div v-if="errorMessage" class="w-full mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-center backdrop-blur-md">
             <p class="font-bold text-white text-lg mb-0.5">Akses Ditolak</p>
             <p class="text-red-400 text-sm font-medium">{{ errorMessage }}</p>
           </div>
@@ -105,7 +125,10 @@ const errorMessage = ref('')
 const isProcessing = ref(false)
 const isFrontCamera = ref(false) 
 
-// [BARU] Setup Custom Dropdown dengan Ikon SVG
+// Variabel untuk menampung nama jemaat dan trigger pop-up
+const showWelcomePopup = ref(false)
+const scannedUserFullname = ref('')
+
 const isDropdownOpen = ref(false)
 const selectedService = ref('AG') 
 
@@ -125,7 +148,6 @@ const selectService = (option) => {
   selectedService.value = option.value
   isDropdownOpen.value = false
 }
-// ------------------------------------------
 
 const isAdmin = ref(false)
 const isUserLoaded = ref(false)
@@ -193,6 +215,7 @@ const onScanSuccess = async (decodedText) => {
   isProcessing.value = true
   successMessage.value = ''
   errorMessage.value = ''
+  showWelcomePopup.value = false
 
   try {
     const response = await axios.post('https://semskii1-ag-connect-api.hf.space/scan', {
@@ -200,10 +223,14 @@ const onScanSuccess = async (decodedText) => {
       service_type: selectedService.value
     })
     
-    const msg = response.data.message;
-    const jamAbsen = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    // Membaca Fullname dari Backend yang sudah diupdate
+    const namaJemaat = response.data.fullname || 'Jemaat'
     
-    successMessage.value = `${msg} di ${selectedService.value} (${jamAbsen})`
+    successMessage.value = 'Hadir' 
+    
+    // Menampilkan Popup Welcome
+    scannedUserFullname.value = namaJemaat
+    showWelcomePopup.value = true
     
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -212,9 +239,11 @@ const onScanSuccess = async (decodedText) => {
       errorMessage.value = 'Terjadi kesalahan jaringan atau server.'
     }
   } finally {
+    // Menutup Popup otomatis setelah 3 detik
     setTimeout(() => {
       successMessage.value = ''
       errorMessage.value = ''
+      showWelcomePopup.value = false
       isProcessing.value = false
     }, 3000)
   }
@@ -243,12 +272,27 @@ const goBack = () => {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease, transform 0.5s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-10px); }
 
-/* Animasi untuk Menu Dropdown Custom */
 .slide-down-enter-active, .slide-down-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .slide-down-enter-from, .slide-down-leave-to {
   opacity: 0;
   transform: translateY(-10px) scale(0.98);
+}
+
+/* Animasi khusus untuk Popup Welcome 3D */
+.pop-bounce-enter-active {
+  animation: popBounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pop-bounce-leave-active {
+  animation: popBounceOut 0.3s ease-in forwards;
+}
+@keyframes popBounceIn {
+  0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes popBounceOut {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0; }
 }
 </style>

@@ -130,7 +130,7 @@ def scan_attendance(request: schemas.AttendanceCreate, db: Session = Depends(get
     db.add(new_attendance)
     db.commit()
     
-    return {"message": pesan_notifikasi}
+    return {"message": pesan_notifikasi, "fullname": user.fullname}
 
 @app.get("/users", response_model=List[schemas.UserResponse])
 def get_users(db: Session = Depends(get_db)):
