@@ -137,8 +137,41 @@ def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
 @app.get("/attendance/logs")
-def get_attendance_logs(db: Session = Depends(get_db)):
-    return db.query(models.Attendance).options(joinedload(models.Attendance.user)).order_by(models.Attendance.scan_time.desc()).all()
+def get_attendance_logs(
+    page: int = 1, 
+    limit: int = 20,
+    service_type: Optional[str] = None,
+    search: Optional[str] = None,
+    date_filter: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(models.Attendance).options(joinedload(models.Attendance.user))
+    
+    # 1. Filter Kategori Ibadah
+    if service_type and service_type != 'Leaderboard':
+        query = query.filter(models.Attendance.service_type == service_type)
+        
+    # 2. Filter Tanggal
+    if date_filter:
+        query = query.filter(func.date(models.Attendance.scan_time) == date_filter)
+        
+    # 3. Filter Pencarian Nama
+    if search:
+        query = query.join(models.User).filter(models.User.fullname.ilike(f"%{search}%"))
+        
+    # 4. Hitung Total Data (Untuk Paginasi Frontend)
+    total_count = query.count()
+    
+    # 5. Potong Data Sesuai Halaman (Paginasi Server-Side)
+    skip = (page - 1) * limit
+    logs = query.order_by(models.Attendance.scan_time.desc()).offset(skip).limit(limit).all()
+    
+    return {
+        "total": total_count,
+        "page": page,
+        "limit": limit,
+        "data": logs
+    }
 
 @app.post("/users/{user_id}/add-quiz-points")
 def add_quiz_points(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):

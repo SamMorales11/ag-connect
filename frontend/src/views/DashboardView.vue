@@ -20,9 +20,9 @@
         </button>
       </div>
 
-      <div v-if="isLoading" class="flex flex-col items-center justify-center py-20">
+      <div v-if="isInitialLoading" class="flex flex-col items-center justify-center py-20">
         <svg class="animate-spin h-10 w-10 text-ag-yellow mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <p class="text-gray-400">Menyinkronkan data...</p>
+        <p class="text-gray-400">Menyiapkan Workspace...</p>
       </div>
 
       <div v-else>
@@ -38,27 +38,27 @@
               
               <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
-                AG ({{ filteredAgLogs.length }})
+                Ibadah AG
               </button>
 
               <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                AG Lite ({{ filteredAgLiteLogs.length }})
+                Ibadah AG Lite
               </button>
 
               <button @click="activeTab = 'Doa Fajar'" :class="activeTab === 'Doa Fajar' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Doa Fajar ({{ filteredDoaFajarLogs.length }})
+                Doa Fajar
               </button>
 
               <button @click="activeTab = 'Doa Pengerja'" :class="activeTab === 'Doa Pengerja' ? 'bg-orange-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                Doa Pengerja ({{ filteredDoaPengerjaLogs.length }})
+                Doa Pengerja
               </button>
 
               <button @click="activeTab = 'AGC/Fellowship'" :class="activeTab === 'AGC/Fellowship' ? 'bg-pink-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                AGC ({{ filteredAgcLogs.length }})
+                AGC
               </button>
             </div>
           </div>
@@ -83,7 +83,8 @@
               <input 
                 v-model="searchQuery" 
                 type="text" 
-                placeholder="Cari jemaat..." 
+                @keyup.enter="triggerSearch"
+                placeholder="Cari (Tekan Enter)..." 
                 class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl pl-10 pr-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-500"
               >
             </div>
@@ -113,7 +114,6 @@
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full relative z-10 gap-4">
                 
                 <div class="flex items-center gap-4 w-full sm:w-auto">
-                  
                   <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors"
                        :class="{
                          'bg-blue-600 text-white shadow-lg shadow-blue-500/20': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
@@ -140,7 +140,6 @@
                 </div>
 
                 <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-6">
-                  
                   <div class="flex flex-col items-start sm:items-end">
                     <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Poin</span>
                     <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-black/40 border border-white/5">
@@ -152,7 +151,6 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     <span class="hidden sm:inline">Tambah Poin</span>
                   </button>
-
                 </div>
               </div>
 
@@ -173,7 +171,12 @@
         </div>
         
         <div v-else class="animate-fade-in-up">
-          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg overflow-hidden">
+          <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg overflow-hidden relative">
+            
+            <div v-if="isLoadingLogs" class="absolute inset-0 bg-[#0A0A0A]/50 backdrop-blur-sm z-20 flex items-center justify-center">
+               <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            </div>
+
             <div class="overflow-x-auto">
               <table class="w-full text-left whitespace-nowrap">
                 <thead>
@@ -184,13 +187,13 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/5">
-                  <tr v-if="currentPaginatedLogs.length === 0">
+                  <tr v-if="currentLogs.length === 0 && !isLoadingLogs">
                     <td colspan="3" class="py-12 text-center text-gray-500 text-sm">
-                      <span v-if="selectedDate">Tidak ada data absensi untuk tanggal ini.</span>
+                      <span v-if="selectedDate || searchQuery">Tidak ada data absensi untuk pencarian ini.</span>
                       <span v-else>Data absensi belum tersedia.</span>
                     </td>
                   </tr>
-                  <tr v-else v-for="log in currentPaginatedLogs" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
+                  <tr v-else v-for="log in currentLogs" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
                     <td class="py-4 px-6"><span class="text-xs font-mono text-gray-400">{{ new Date(log.scan_time).toLocaleString('id-ID') }}</span></td>
                     <td class="py-4 px-6 font-bold text-gray-200">{{ log.user?.fullname || 'User Dihapus' }}</td>
                     <td class="py-4 px-6 text-xs text-gray-400">{{ log.user?.status || '-' }}</td>
@@ -204,12 +207,13 @@
         <div v-if="currentTotalPages > 1" class="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4 animate-fade-in-up">
           <span class="text-sm font-medium text-gray-500">
             Halaman <span class="text-white">{{ currentPage }}</span> dari <span class="text-white">{{ currentTotalPages }}</span>
+            <span v-if="activeTab !== 'Leaderboard'"> (Total: {{ totalLogs }} Data)</span>
           </span>
           <div class="flex gap-2">
-            <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <button @click="prevPage" :disabled="currentPage === 1 || isLoadingLogs" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
               Sebelumnya
             </button>
-            <button @click="nextPage" :disabled="currentPage === currentTotalPages" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+            <button @click="nextPage" :disabled="currentPage === currentTotalPages || isLoadingLogs" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
               Selanjutnya
             </button>
           </div>
@@ -279,19 +283,41 @@ import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const router = useRouter()
-const isLoading = ref(true)
-const allLogs = ref([])
-const allUsers = ref([])
-const activeTab = ref('Leaderboard') 
+const isInitialLoading = ref(true)
+const isLoadingLogs = ref(false)
 
+const allUsers = ref([])
+const currentLogs = ref([]) 
+const totalLogs = ref(0)    
+
+const activeTab = ref('Leaderboard') 
 const searchQuery = ref('')
 const selectedDate = ref('') 
 const currentPage = ref(1)
 const itemsPerPage = 20
 
-watch([searchQuery, activeTab, selectedDate], () => {
+// Jika ganti Tab atau Tanggal, kembali ke Halaman 1 dan muat ulang log API
+watch([activeTab, selectedDate], () => {
   currentPage.value = 1
+  if (activeTab.value !== 'Leaderboard') {
+    fetchLogsFromServer()
+  }
 })
+
+// Jika ganti halaman Paginasi, muat ulang log API
+watch(currentPage, () => {
+  if (activeTab.value !== 'Leaderboard') {
+    fetchLogsFromServer()
+  }
+})
+
+// Fungsi memicu pencarian (Enter ditekan)
+const triggerSearch = () => {
+  currentPage.value = 1
+  if (activeTab.value !== 'Leaderboard') {
+    fetchLogsFromServer()
+  }
+}
 
 const showConfirmModal = ref(false)
 const selectedUser = ref(null)
@@ -311,21 +337,44 @@ onMounted(async () => {
     router.push('/login')
     return
   }
-  await fetchData(token)
-})
-
-const fetchData = async (token) => {
+  
   try {
-    const [logsRes, usersRes] = await Promise.all([
-      axios.get('https://semskii1-ag-connect-api.hf.space/attendance/logs', { headers: { Authorization: `Bearer ${token}` } }),
-      axios.get('https://semskii1-ag-connect-api.hf.space/users', { headers: { Authorization: `Bearer ${token}` } })
-    ])
-    allLogs.value = logsRes.data.map(log => ({ ...log, service_type: log.service_type || 'AG' }))
+    // Hanya fetch User (Jemaat) di awal untuk tabel Leaderboard
+    const usersRes = await axios.get('https://semskii1-ag-connect-api.hf.space/users', { headers: { Authorization: `Bearer ${token}` } })
     allUsers.value = usersRes.data
   } catch (error) {
     console.error("Gagal memuat data", error)
   } finally {
-    isLoading.value = false
+    isInitialLoading.value = false
+  }
+})
+
+// --- [MAHAKARYA BARU] FUNGSI SERVER-SIDE PAGINATION ---
+const fetchLogsFromServer = async () => {
+  isLoadingLogs.value = true
+  try {
+    const token = localStorage.getItem('access_token')
+    
+    // Siapkan parameter URL
+    const params = new URLSearchParams({
+      page: currentPage.value,
+      limit: itemsPerPage,
+      service_type: activeTab.value
+    })
+    
+    if (searchQuery.value) params.append('search', searchQuery.value)
+    if (selectedDate.value) params.append('date_filter', selectedDate.value)
+
+    const res = await axios.get(`https://semskii1-ag-connect-api.hf.space/attendance/logs?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    
+    currentLogs.value = res.data.data
+    totalLogs.value = res.data.total
+  } catch (error) {
+    console.error("Gagal memuat log dari server:", error)
+  } finally {
+    isLoadingLogs.value = false
   }
 }
 
@@ -388,9 +437,10 @@ const confirmResetPoints = async () => {
   }
 }
 
+// Perhitungan Leaderboard tetap Client-Side karena ringan
 const filteredUsers = computed(() => {
   let users = [...allUsers.value].sort((a, b) => b.points - a.points).filter(u => u.points >= 0)
-  if (searchQuery.value) {
+  if (searchQuery.value && activeTab.value === 'Leaderboard') {
     const q = searchQuery.value.toLowerCase()
     users = users.filter(u => u.fullname.toLowerCase().includes(q) || u.username.toLowerCase().includes(q))
   }
@@ -402,58 +452,14 @@ const maxLeaderboardPoints = computed(() => {
   return Math.max(filteredUsers.value[0].points, 1);
 })
 
-const getFilteredLogs = (type) => {
-  let logs = allLogs.value.filter(log => log.service_type === type).sort((a,b) => new Date(b.scan_time) - new Date(a.scan_time))
-  
-  if (searchQuery.value) {
-    const q = searchQuery.value.toLowerCase()
-    logs = logs.filter(log => (log.user?.fullname || '').toLowerCase().includes(q))
-  }
-
-  if (selectedDate.value) {
-    logs = logs.filter(log => {
-      const dateObj = new Date(log.scan_time)
-      const year = dateObj.getFullYear()
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0')
-      const day = String(dateObj.getDate()).padStart(2, '0')
-      const formattedLogDate = `${year}-${month}-${day}`
-      return formattedLogDate === selectedDate.value
-    })
-  }
-
-  return logs
-}
-
-const filteredAgLogs = computed(() => getFilteredLogs('AG'))
-const filteredAgLiteLogs = computed(() => getFilteredLogs('AG Lite'))
-const filteredDoaFajarLogs = computed(() => getFilteredLogs('Doa Fajar'))
-const filteredDoaPengerjaLogs = computed(() => getFilteredLogs('Doa Pengerja'))
-const filteredAgcLogs = computed(() => getFilteredLogs('AGC/Fellowship'))
-
 const paginatedUsers = computed(() => filteredUsers.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
-const paginatedAgLogs = computed(() => filteredAgLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
-const paginatedAgLiteLogs = computed(() => filteredAgLiteLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
-const paginatedDoaFajarLogs = computed(() => filteredDoaFajarLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
-const paginatedDoaPengerjaLogs = computed(() => filteredDoaPengerjaLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
-const paginatedAgcLogs = computed(() => filteredAgcLogs.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
 
-const currentPaginatedLogs = computed(() => {
-  if (activeTab.value === 'AG') return paginatedAgLogs.value;
-  if (activeTab.value === 'AG Lite') return paginatedAgLiteLogs.value;
-  if (activeTab.value === 'Doa Fajar') return paginatedDoaFajarLogs.value;
-  if (activeTab.value === 'Doa Pengerja') return paginatedDoaPengerjaLogs.value;
-  if (activeTab.value === 'AGC/Fellowship') return paginatedAgcLogs.value;
-  return [];
-})
-
+// Total Halaman Berubah Sesuai Tab yang Aktif
 const currentTotalPages = computed(() => {
-  if (activeTab.value === 'Leaderboard') return Math.ceil(filteredUsers.value.length / itemsPerPage)
-  if (activeTab.value === 'AG') return Math.ceil(filteredAgLogs.value.length / itemsPerPage)
-  if (activeTab.value === 'AG Lite') return Math.ceil(filteredAgLiteLogs.value.length / itemsPerPage)
-  if (activeTab.value === 'Doa Fajar') return Math.ceil(filteredDoaFajarLogs.value.length / itemsPerPage)
-  if (activeTab.value === 'Doa Pengerja') return Math.ceil(filteredDoaPengerjaLogs.value.length / itemsPerPage)
-  if (activeTab.value === 'AGC/Fellowship') return Math.ceil(filteredAgcLogs.value.length / itemsPerPage)
-  return 1;
+  if (activeTab.value === 'Leaderboard') {
+    return Math.ceil(filteredUsers.value.length / itemsPerPage) || 1
+  }
+  return Math.ceil(totalLogs.value / itemsPerPage) || 1
 })
 
 const nextPage = () => { if (currentPage.value < currentTotalPages.value) currentPage.value++ }

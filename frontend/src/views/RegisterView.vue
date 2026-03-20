@@ -276,25 +276,85 @@ const handleRegister = async () => {
   }
 }
 
+// --- [DIPERBARUI] FUNGSI DOWNLOAD KARTU DIGITAL UTUH ---
 const downloadQRCode = () => {
   if (!qrContainer.value) return
 
-  const canvas = qrContainer.value.querySelector('canvas')
+  const qrCanvas = qrContainer.value.querySelector('canvas')
   
-  if (canvas) {
-    const imageUrl = canvas.toDataURL('image/png')
-    const downloadLink = document.createElement('a')
-    downloadLink.href = imageUrl
-    
-    const safeFilename = registeredData.value.fullname.replace(/\s+/g, '_')
-    downloadLink.download = `Kartu_AG_${safeFilename}.png`
-    
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
-  } else {
+  if (!qrCanvas) {
     alert("Gagal memuat gambar QR. Silakan screenshot layar ini.")
+    return
   }
+
+  // 1. Buat Kanvas Virtual untuk Menggambar Tiket Utuh
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+
+  // Ukuran Kartu Jemaat
+  canvas.width = 400
+  canvas.height = 550
+
+  // 2. Gambar Background Gelap Mewah
+  ctx.fillStyle = '#0A0A0A'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  // 3. Gambar Garis Akses Atas (AG Colors)
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0)
+  gradient.addColorStop(0, '#7c2889') // AG Purple
+  gradient.addColorStop(1, '#fde021') // AG Yellow
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, canvas.width, 10)
+
+  // 4. GAMBAR ZONA PUTIH (QUIET ZONE) UNTUK QR CODE
+  // Inilah rahasia yang membuat scan HP menjadi sangat cepat!
+  const whiteBoxSize = 280 
+  const boxX = (canvas.width - whiteBoxSize) / 2
+  const boxY = 70
+  
+  ctx.fillStyle = '#FFFFFF'
+  // Membuat kotak putih dengan sudut melengkung tipis
+  ctx.beginPath()
+  ctx.roundRect ? ctx.roundRect(boxX, boxY, whiteBoxSize, whiteBoxSize, 16) : ctx.fillRect(boxX, boxY, whiteBoxSize, whiteBoxSize)
+  ctx.fill()
+
+  // 5. Tempelkan QR Code Asli ke tengah kotak putih
+  const qrImageSize = 240
+  const qrOffset = (whiteBoxSize - qrImageSize) / 2
+  ctx.drawImage(qrCanvas, boxX + qrOffset, boxY + qrOffset, qrImageSize, qrImageSize)
+
+  // 6. Tulis Nama Jemaat
+  ctx.textAlign = 'center'
+  ctx.fillStyle = '#FFFFFF'
+  ctx.font = 'bold 28px sans-serif'
+  ctx.fillText(registeredData.value.fullname, canvas.width / 2, boxY + whiteBoxSize + 60)
+
+  // 7. Label Kode Referal
+  ctx.fillStyle = '#9CA3AF'
+  ctx.font = 'bold 12px sans-serif'
+  ctx.fillText('KODE REFERAL:', canvas.width / 2, boxY + whiteBoxSize + 95)
+
+  // 8. Tulis Nilai Kode Referal
+  ctx.fillStyle = '#fde021'
+  ctx.font = 'bold 22px monospace'
+  ctx.fillText('@' + registeredData.value.username, canvas.width / 2, boxY + whiteBoxSize + 125)
+
+  // 9. Footer Watermark
+  ctx.fillStyle = '#4B5563'
+  ctx.font = '10px sans-serif'
+  ctx.fillText('AG Connect - Arrow Generation', canvas.width / 2, canvas.height - 20)
+
+  // 10. Proses Unduh Gambar
+  const imageUrl = canvas.toDataURL('image/png')
+  const downloadLink = document.createElement('a')
+  downloadLink.href = imageUrl
+  
+  const safeFilename = registeredData.value.fullname.replace(/\s+/g, '_')
+  downloadLink.download = `Kartu_AG_${safeFilename}.png`
+  
+  document.body.appendChild(downloadLink)
+  downloadLink.click()
+  document.body.removeChild(downloadLink)
 }
 </script>
 

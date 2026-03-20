@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
+from datetime import datetime
 
 class User(Base):
     __tablename__ = "users"
@@ -31,8 +32,8 @@ class Attendance(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    scan_time = Column(DateTime(timezone=True), server_default=func.now())
-    service_type = Column(String, default="AG")
+    scan_time = Column(DateTime, default=datetime.utcnow, index=True)
+    service_type = Column(String, index=True)
 
     # [BARU] Relasi ke tabel User agar FastAPI bisa memanggil log.user.fullname
     user = relationship("User", back_populates="attendances")
