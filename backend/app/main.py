@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Response
+from fastapi import FastAPI, Depends, HTTPException, status, Response, Body
 from sqlalchemy.orm import Session, joinedload
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
@@ -188,6 +188,30 @@ def add_quiz_points(user_id: int, db: Session = Depends(get_db), current_admin: 
     
     return {"message": f"🎉 10 Poin Kuis berhasil dikirim ke {target_user.fullname}!"}
 
+# --- [FITUR BARU] TUKAR POIN (REDEEM) ---
+@app.post("/users/{user_id}/redeem-points")
+def redeem_points(user_id: int, points_to_deduct: int = Body(..., embed=True), db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
+    # Validasi Admin
+    if not current_admin.is_admin:
+        raise HTTPException(status_code=403, detail="Akses ditolak. Hanya Admin yang dapat memotong poin jemaat.")
+        
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    
+    # Validasi Jemaat & Saldo Poin
+    if not user:
+        raise HTTPException(status_code=404, detail="Jemaat tidak ditemukan.")
+    if user.points < points_to_deduct:
+        raise HTTPException(status_code=400, detail=f"Poin tidak cukup! Saldo saat ini: {user.points}")
+        
+    # Eksekusi Pemotongan Poin
+    user.points -= points_to_deduct
+    db.commit()
+    
+    return {
+        "message": f"Berhasil menukar poin. Sisa poin: {user.points}", 
+        "remaining_points": user.points
+    }
+
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
     if not current_admin.is_admin:
@@ -225,7 +249,6 @@ def reset_all_points(db: Session = Depends(get_db), current_admin: models.User =
     
     return {"message": "Semua poin jemaat berhasil direset ke 0! Musim baru siap dimulai."}
 
-# --- [MAHAKARYA BARU] FUNGSI EXPORT DATA BENTUK MATRIKS DENGAN AUTO-FORMAT EXCEL ---
 @app.get("/export/attendances")
 def export_attendances(filter: str = 'all', service_type: str = 'Semua', db: Session = Depends(get_db), current_admin: models.User = Depends(get_current_user)):
     if not current_admin.is_admin:
@@ -247,55 +270,42 @@ def export_attendances(filter: str = 'all', service_type: str = 'Semua', db: Ses
         month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         query = query.filter(models.Attendance.scan_time >= month_start)
         
-    # Ambil log yang sudah difilter
     logs = query.order_by(models.Attendance.scan_time.asc()).all()
     
     si = StringIO()
-    
-    # [TRIK RAHASIA] Memaksa Excel membaca koma sebagai pemisah kolom secara otomatis
     si.write("sep=,\n")
-    
     cw = csv.writer(si, delimiter=',')
     
     if not logs:
         cw.writerow(["Tidak ada data kehadiran untuk kriteria ini."])
-        # Tambahkan BOM agar karakter terbaca sempurna oleh Excel
         return Response(content='\ufeff' + si.getvalue(), media_type="text/csv")
 
-    # 1. Temukan Tanggal Unik (Untuk dijadikan Kolom ke kanan)
     unique_dates = sorted(list(set(log.scan_time.date() for log in logs)))
     date_headers = [d.strftime("%d %b %Y") for d in unique_dates]
     
-    # 2. Buat Header Tabel (Pojok Kiri)
     headers = ["Nama Jemaat", "Kategori", "Total Hadir"] + date_headers
     cw.writerow(headers)
     
-    # 3. Kelompokkan data absensi berdasarkan ID Jemaat
     attendance_map = {}
     for log in logs:
         if log.user_id not in attendance_map:
             attendance_map[log.user_id] = set()
         attendance_map[log.user_id].add(log.scan_time.date())
         
-    # 4. Tampilkan semua Jemaat yang terdaftar di sistem
     all_users = db.query(models.User).order_by(models.User.fullname).all()
     
     for user in all_users:
         user_dates_present = attendance_map.get(user.id, set())
-        
-        # Susun baris awal: Nama, Kategori, Total Hadir
         kategori_user = user.status if user.status else "-"
         row = [user.fullname, kategori_user, len(user_dates_present)]
         
-        # Beri tanda "v" jika hadir di tanggal tersebut, "-" jika absen
         for d in unique_dates:
             if d in user_dates_present:
-                row.append("v") # Hadir
+                row.append("v") 
             else:
-                row.append("-") # Tidak Hadir
+                row.append("-") 
                 
         cw.writerow(row)
         
-    # Gabungkan BOM (\ufeff) dengan isi CSV agar Excel tidak salah membaca format
     output_string = '\ufeff' + si.getvalue()
     return Response(content=output_string, media_type="text/csv")

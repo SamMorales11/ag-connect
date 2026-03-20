@@ -11,7 +11,7 @@
           <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-ag-purple tracking-tight mb-1">
             Dashboard <span class="text-white">Analitik</span>
           </h1>
-          <p class="text-gray-400 text-sm font-medium">Pantau kehadiran dan berikan poin apresiasi jemaat.</p>
+          <p class="text-gray-400 text-sm font-medium">Pantau statistik kehadiran dan kelola poin apresiasi jemaat.</p>
         </div>
         
         <button @click="$router.push('/profile')" class="group shrink-0 flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all duration-300 backdrop-blur-sm">
@@ -22,55 +22,45 @@
 
       <div v-if="isInitialLoading" class="flex flex-col items-center justify-center py-20">
         <svg class="animate-spin h-10 w-10 text-ag-yellow mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-        <p class="text-gray-400">Menyiapkan Workspace...</p>
+        <p class="text-gray-400">Menyiapkan Analytics Workspace...</p>
       </div>
 
       <div v-else>
         
         <div class="flex flex-col gap-5 border-b border-white/10 pb-6 mb-8">
-          
           <div class="w-full overflow-x-auto pb-2 -mb-2 hide-scrollbar relative">
             <div class="flex items-center gap-2 w-max pr-4">
+              <button @click="activeTab = 'Ringkasan'" :class="activeTab === 'Ringkasan' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Ringkasan Analitik
+              </button>
+
               <button @click="activeTab = 'Leaderboard'" :class="activeTab === 'Leaderboard' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-                Klasemen Utama
+                Klasemen Poin
               </button>
               
               <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
-                Ibadah AG
+                AG
               </button>
-
               <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                Ibadah AG Lite
+                AG Lite
               </button>
-
               <button @click="activeTab = 'Doa Fajar'" :class="activeTab === 'Doa Fajar' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 Doa Fajar
               </button>
-
               <button @click="activeTab = 'Doa Pengerja'" :class="activeTab === 'Doa Pengerja' ? 'bg-orange-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 Doa Pengerja
               </button>
-
               <button @click="activeTab = 'AGC/Fellowship'" :class="activeTab === 'AGC/Fellowship' ? 'bg-pink-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                AGC/Fellowship
+                AGC / Fellowship
               </button>
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row items-center justify-end gap-3 w-full shrink-0">
-            
+          <div v-if="activeTab !== 'Ringkasan'" class="flex flex-col sm:flex-row items-center justify-end gap-3 w-full shrink-0">
             <div v-if="activeTab !== 'Leaderboard'" class="relative w-full sm:w-40">
-              <input 
-                v-model="selectedDate" 
-                type="date" 
-                class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all cursor-pointer custom-date-input"
-              >
+              <input v-model="selectedDate" type="date" class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl px-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all cursor-pointer custom-date-input">
               <button v-if="selectedDate" @click="selectedDate = ''" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
@@ -80,20 +70,37 @@
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
               </div>
-              <input 
-                v-model="searchQuery" 
-                type="text" 
-                @keyup.enter="triggerSearch"
-                placeholder="Cari (Tekan Enter)..." 
-                class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl pl-10 pr-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-500"
-              >
+              <input v-model="searchQuery" type="text" @keyup.enter="triggerSearch" placeholder="Cari (Tekan Enter)..." class="w-full bg-black/50 border border-gray-700 text-white text-sm rounded-xl pl-10 pr-4 py-2.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder-gray-500">
             </div>
 
             <button v-if="activeTab === 'Leaderboard'" @click="showResetModal = true" class="w-full sm:w-auto px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center gap-2">
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
               <span class="whitespace-nowrap">Reset Data</span>
             </button>
+          </div>
+        </div>
 
+        <div v-if="activeTab === 'Ringkasan'" class="animate-fade-in-up space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+              <p class="text-gray-400 text-sm font-semibold uppercase tracking-widest mb-1">Total Jemaat Terdaftar</p>
+              <h3 class="text-4xl font-black text-white">{{ allUsers.length }}</h3>
+            </div>
+            <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-md">
+              <p class="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-1">Total Poin Beredar</p>
+              <h3 class="text-4xl font-black text-blue-300">{{ totalPointsInSystem }} <span class="text-lg font-medium text-blue-500/50">pts</span></h3>
+            </div>
+          </div>
+
+          <div class="bg-[#111] border border-white/10 rounded-2xl p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+              Grafik Kehadiran Jemaat (30 Hari Terakhir)
+            </h3>
+            
+            <div class="h-[300px] w-full">
+              <apexchart type="area" height="100%" :options="chartOptions" :series="chartSeries"></apexchart>
+            </div>
           </div>
         </div>
 
@@ -139,7 +146,7 @@
                   </div>
                 </div>
 
-                <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-6">
+                <div class="flex items-center justify-between w-full sm:w-auto gap-4 md:gap-4">
                   <div class="flex flex-col items-start sm:items-end">
                     <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Poin</span>
                     <div class="flex items-center gap-2 px-3 py-1 rounded-lg bg-black/40 border border-white/5">
@@ -147,30 +154,30 @@
                     </div>
                   </div>
 
-                  <button @click="openConfirmModal(user)" class="shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-semibold rounded-lg transition-all outline-none">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    <span class="hidden sm:inline">Tambah Poin</span>
-                  </button>
+                  <div class="flex gap-2">
+                    <button @click="openConfirmModal(user)" class="shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white/5 hover:bg-blue-500/20 border border-white/10 hover:border-blue-500/50 text-gray-300 hover:text-blue-400 text-xs font-semibold rounded-lg transition-all outline-none" title="Tambah Poin">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    </button>
+                    
+                    <button @click="openRedeemModal(user)" class="shrink-0 flex items-center justify-center gap-2 px-3 py-2 bg-white/5 hover:bg-orange-500/20 border border-white/10 hover:border-orange-500/50 text-gray-300 hover:text-orange-400 text-xs font-semibold rounded-lg transition-all outline-none" title="Tukar Poin (Redeem)">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div class="w-full mt-4 bg-white/5 rounded-full h-1 overflow-hidden">
                 <div class="h-full rounded-full transition-all duration-1000 ease-out"
-                     :class="{
-                       'bg-blue-500': (currentPage - 1) * itemsPerPage + index === 0 && user.points > 0,
-                       'bg-gray-400': (currentPage - 1) * itemsPerPage + index > 0 && user.points > 0,
-                       'bg-transparent': user.points === 0
-                     }"
+                     :class="user.points > 0 ? 'bg-blue-500' : 'bg-transparent'"
                      :style="{ width: `${(user.points / maxLeaderboardPoints) * 100}%` }">
                 </div>
               </div>
 
             </div>
-
           </div>
         </div>
         
-        <div v-else class="animate-fade-in-up">
+        <div v-if="!['Leaderboard', 'Ringkasan'].includes(activeTab)" class="animate-fade-in-up">
           <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg overflow-hidden relative">
             
             <div v-if="isLoadingLogs" class="absolute inset-0 bg-[#0A0A0A]/50 backdrop-blur-sm z-20 flex items-center justify-center">
@@ -189,8 +196,7 @@
                 <tbody class="divide-y divide-white/5">
                   <tr v-if="currentLogs.length === 0 && !isLoadingLogs">
                     <td colspan="3" class="py-12 text-center text-gray-500 text-sm">
-                      <span v-if="selectedDate || searchQuery">Tidak ada data absensi untuk pencarian ini.</span>
-                      <span v-else>Data absensi belum tersedia.</span>
+                      Data absensi belum tersedia.
                     </td>
                   </tr>
                   <tr v-else v-for="log in currentLogs" :key="log.id" class="hover:bg-white/[0.02] transition-colors">
@@ -204,10 +210,9 @@
           </div>
         </div>
 
-        <div v-if="currentTotalPages > 1" class="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4 animate-fade-in-up">
+        <div v-if="currentTotalPages > 1 && activeTab !== 'Ringkasan'" class="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4 animate-fade-in-up">
           <span class="text-sm font-medium text-gray-500">
             Halaman <span class="text-white">{{ currentPage }}</span> dari <span class="text-white">{{ currentTotalPages }}</span>
-            <span v-if="activeTab !== 'Leaderboard'"> (Total: {{ totalLogs }} Data)</span>
           </span>
           <div class="flex gap-2">
             <button @click="prevPage" :disabled="currentPage === 1 || isLoadingLogs" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed">
@@ -225,18 +230,12 @@
     <transition name="fade">
       <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
         <div class="bg-[#111] border border-white/10 p-6 md:p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl transform transition-all">
-          <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mx-auto mb-4 text-blue-500">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-          </div>
           <h3 class="text-xl font-bold text-white mb-2">Tambah Data Poin</h3>
-          <p class="text-gray-400 text-sm mb-8 leading-relaxed">
-            Sistem akan menambahkan +10 poin untuk <br>
-            <span class="font-bold text-blue-400 text-base">{{ selectedUser?.fullname }}</span>
-          </p>
+          <p class="text-gray-400 text-sm mb-8 leading-relaxed">Sistem akan menambahkan +10 poin untuk <br><span class="font-bold text-blue-400 text-base">{{ selectedUser?.fullname }}</span></p>
           <div class="flex gap-3">
-            <button @click="showConfirmModal = false" :disabled="isGivingPoints" class="flex-1 py-2.5 rounded-lg font-bold text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white border border-white/5 transition-colors disabled:opacity-50">Batal</button>
-            <button @click="confirmGivePoints" :disabled="isGivingPoints" class="flex-1 py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-500 transition-all flex justify-center items-center disabled:opacity-50">
-              <span v-if="isGivingPoints" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            <button @click="showConfirmModal = false" :disabled="isProcessingApi" class="flex-1 py-2.5 rounded-lg font-bold text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white border border-white/5 transition-colors disabled:opacity-50">Batal</button>
+            <button @click="confirmGivePoints" :disabled="isProcessingApi" class="flex-1 py-2.5 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-500 transition-all flex justify-center items-center disabled:opacity-50">
+              <span v-if="isProcessingApi" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
               <span v-else>Konfirmasi</span>
             </button>
           </div>
@@ -245,20 +244,27 @@
     </transition>
 
     <transition name="fade">
-      <div v-if="showResetModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+      <div v-if="showRedeemModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
         <div class="bg-[#111] border border-white/10 p-6 md:p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl transform transition-all">
-          <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-4 text-red-500">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div class="w-16 h-16 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center mx-auto mb-4 text-orange-500">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
-          <h3 class="text-xl font-bold text-white mb-2">Reset Data Poin</h3>
-          <p class="text-gray-400 text-sm mb-6 leading-relaxed">
-            Tindakan ini akan mengembalikan <strong class="text-red-400">poin seluruh entitas menjadi 0</strong>. Tindakan ini tidak dapat dibatalkan.
+          <h3 class="text-xl font-bold text-white mb-2">Tukar Poin Jemaat</h3>
+          <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+            Saldo <span class="font-bold text-white">{{ selectedUser?.fullname }}</span> saat ini: 
+            <span class="font-bold text-orange-400">{{ selectedUser?.points }} Pts</span>
           </p>
+          
+          <div class="text-left mb-6">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Jumlah Poin yang Dipotong</label>
+            <input v-model="redeemAmount" type="number" min="1" :max="selectedUser?.points" class="w-full bg-black/50 border border-gray-700 text-white rounded-lg px-4 py-3 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-all text-center font-bold text-xl" placeholder="Misal: 50">
+          </div>
+
           <div class="flex gap-3">
-            <button @click="showResetModal = false" :disabled="isResetting" class="flex-1 py-2.5 rounded-lg font-bold text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white border border-white/5 transition-colors disabled:opacity-50">Batal</button>
-            <button @click="confirmResetPoints" :disabled="isResetting" class="flex-1 py-2.5 rounded-lg font-bold text-white bg-red-600 hover:bg-red-500 transition-all flex justify-center items-center disabled:opacity-50">
-              <span v-if="isResetting" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              <span v-else>Lanjutkan</span>
+            <button @click="showRedeemModal = false" :disabled="isProcessingApi" class="flex-1 py-2.5 rounded-lg font-bold text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white border border-white/5 transition-colors disabled:opacity-50">Batal</button>
+            <button @click="confirmRedeemPoints" :disabled="isProcessingApi || redeemAmount < 1 || redeemAmount > selectedUser?.points" class="flex-1 py-2.5 rounded-lg font-bold text-white bg-orange-600 hover:bg-orange-500 transition-all flex justify-center items-center disabled:opacity-50">
+              <span v-if="isProcessingApi" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span v-else>Potong Poin</span>
             </button>
           </div>
         </div>
@@ -281,6 +287,10 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import VueApexCharts from 'vue3-apexcharts' 
+
+// Registrasi komponen ApexCharts agar bisa dipakai di template
+const apexchart = VueApexCharts
 
 const router = useRouter()
 const isInitialLoading = ref(true)
@@ -290,46 +300,57 @@ const allUsers = ref([])
 const currentLogs = ref([]) 
 const totalLogs = ref(0)    
 
-const activeTab = ref('Leaderboard') 
+// Tab Default diubah menjadi Ringkasan
+const activeTab = ref('Ringkasan') 
 const searchQuery = ref('')
 const selectedDate = ref('') 
 const currentPage = ref(1)
 const itemsPerPage = 20
 
-// Jika ganti Tab atau Tanggal, kembali ke Halaman 1 dan muat ulang log API
-watch([activeTab, selectedDate], () => {
-  currentPage.value = 1
-  if (activeTab.value !== 'Leaderboard') {
-    fetchLogsFromServer()
-  }
-})
-
-// Jika ganti halaman Paginasi, muat ulang log API
-watch(currentPage, () => {
-  if (activeTab.value !== 'Leaderboard') {
-    fetchLogsFromServer()
-  }
-})
-
-// Fungsi memicu pencarian (Enter ditekan)
-const triggerSearch = () => {
-  currentPage.value = 1
-  if (activeTab.value !== 'Leaderboard') {
-    fetchLogsFromServer()
-  }
-}
-
+// State untuk Modals
 const showConfirmModal = ref(false)
-const selectedUser = ref(null)
-const isGivingPoints = ref(false)
-
+const showRedeemModal = ref(false)
 const showResetModal = ref(false)
-const isResetting = ref(false)
+const selectedUser = ref(null)
+const redeemAmount = ref(0)
+const isProcessingApi = ref(false)
 
 const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref('success')
 let toastTimer = null
+
+// --- KONFIGURASI GRAFIK APEXCHARTS ---
+const chartOptions = ref({
+  chart: {
+    type: 'area',
+    background: 'transparent',
+    toolbar: { show: false },
+    fontFamily: 'inherit'
+  },
+  theme: { mode: 'dark' },
+  colors: ['#8b5cf6', '#eab308'],
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 3 },
+  xaxis: {
+    categories: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4', 'Minggu 5'], // Label Dummy untuk presentasi
+    axisBorder: { show: false },
+    axisTicks: { show: false }
+  },
+  yaxis: { show: false },
+  grid: { borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4 },
+  fill: {
+    type: 'gradient',
+    gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] }
+  },
+  legend: { position: 'top', horizontalAlign: 'right' }
+})
+
+// Data Dummy Grafik (Bisa diganti dinamis dari backend nantinya)
+const chartSeries = ref([
+  { name: 'Ibadah AG', data: [45, 52, 68, 84, 110] },
+  { name: 'AG Lite', data: [20, 35, 41, 60, 85] }
+])
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
@@ -339,7 +360,6 @@ onMounted(async () => {
   }
   
   try {
-    // Hanya fetch User (Jemaat) di awal untuk tabel Leaderboard
     const usersRes = await axios.get('https://semskii1-ag-connect-api.hf.space/users', { headers: { Authorization: `Bearer ${token}` } })
     allUsers.value = usersRes.data
   } catch (error) {
@@ -349,19 +369,31 @@ onMounted(async () => {
   }
 })
 
-// --- [MAHAKARYA BARU] FUNGSI SERVER-SIDE PAGINATION ---
+watch([activeTab, selectedDate], () => {
+  currentPage.value = 1
+  if (!['Leaderboard', 'Ringkasan'].includes(activeTab.value)) {
+    fetchLogsFromServer()
+  }
+})
+
+watch(currentPage, () => {
+  if (!['Leaderboard', 'Ringkasan'].includes(activeTab.value)) {
+    fetchLogsFromServer()
+  }
+})
+
+const triggerSearch = () => {
+  currentPage.value = 1
+  if (!['Leaderboard', 'Ringkasan'].includes(activeTab.value)) {
+    fetchLogsFromServer()
+  }
+}
+
 const fetchLogsFromServer = async () => {
   isLoadingLogs.value = true
   try {
     const token = localStorage.getItem('access_token')
-    
-    // Siapkan parameter URL
-    const params = new URLSearchParams({
-      page: currentPage.value,
-      limit: itemsPerPage,
-      service_type: activeTab.value
-    })
-    
+    const params = new URLSearchParams({ page: currentPage.value, limit: itemsPerPage, service_type: activeTab.value })
     if (searchQuery.value) params.append('search', searchQuery.value)
     if (selectedDate.value) params.append('date_filter', selectedDate.value)
 
@@ -372,22 +404,29 @@ const fetchLogsFromServer = async () => {
     currentLogs.value = res.data.data
     totalLogs.value = res.data.total
   } catch (error) {
-    console.error("Gagal memuat log dari server:", error)
+    console.error("Gagal memuat log:", error)
   } finally {
     isLoadingLogs.value = false
   }
 }
 
-const openConfirmModal = (user) => {
-  selectedUser.value = user
-  showConfirmModal.value = true
+// Menampilkan Toast Notifikasi
+const displayToast = (msg, type = 'success') => {
+  clearTimeout(toastTimer)
+  toastMessage.value = msg
+  toastType.value = type
+  showToast.value = true
+  toastTimer = setTimeout(() => { showToast.value = false }, 3000)
 }
 
+// --- LOGIKA MODAL ---
+const openConfirmModal = (user) => { selectedUser.value = user; showConfirmModal.value = true }
+const openRedeemModal = (user) => { selectedUser.value = user; redeemAmount.value = 0; showRedeemModal.value = true }
+
+// Fungsi Tambah Poin Asli
 const confirmGivePoints = async () => {
   if (!selectedUser.value) return
-  isGivingPoints.value = true
-  clearTimeout(toastTimer)
-  showToast.value = false
+  isProcessingApi.value = true
 
   try {
     const token = localStorage.getItem('access_token')
@@ -395,49 +434,42 @@ const confirmGivePoints = async () => {
       headers: { Authorization: `Bearer ${token}` }
     })
     selectedUser.value.points += 10
-    toastType.value = 'success'
-    toastMessage.value = response.data.message
-    showToast.value = true
+    displayToast(response.data.message)
   } catch (error) {
-    toastType.value = 'error'
-    toastMessage.value = error.response?.data?.detail || "Gagal memperbarui data."
-    showToast.value = true
+    displayToast(error.response?.data?.detail || "Gagal memperbarui data.", 'error')
   } finally {
-    isGivingPoints.value = false
-    showConfirmModal.value = false
-    selectedUser.value = null
-    toastTimer = setTimeout(() => { showToast.value = false }, 3000)
+    isProcessingApi.value = false; showConfirmModal.value = false; selectedUser.value = null
   }
 }
 
-const confirmResetPoints = async () => {
-  isResetting.value = true
-  clearTimeout(toastTimer)
-  showToast.value = false
+// Fungsi TUKAR POIN (Baru)
+const confirmRedeemPoints = async () => {
+  if (!selectedUser.value || redeemAmount.value < 1) return
+  isProcessingApi.value = true
 
   try {
     const token = localStorage.getItem('access_token')
-    const response = await axios.put('https://semskii1-ag-connect-api.hf.space/users/reset-points', {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const response = await axios.post(`https://semskii1-ag-connect-api.hf.space/users/${selectedUser.value.id}/redeem-points`, 
+      { points_to_deduct: redeemAmount.value }, 
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
     
-    allUsers.value.forEach(u => u.points = 0)
+    // Kurangi poin secara visual di Frontend
+    selectedUser.value.points -= redeemAmount.value
+    displayToast(response.data.message)
     
-    toastType.value = 'success'
-    toastMessage.value = response.data.message
-    showToast.value = true
   } catch (error) {
-    toastType.value = 'error'
-    toastMessage.value = error.response?.data?.detail || "Gagal mereset data. Akses ditolak."
-    showToast.value = true
+    displayToast(error.response?.data?.detail || "Gagal memotong poin.", 'error')
   } finally {
-    isResetting.value = false
-    showResetModal.value = false
-    toastTimer = setTimeout(() => { showToast.value = false }, 3000)
+    isProcessingApi.value = false; showRedeemModal.value = false; selectedUser.value = null
   }
 }
 
-// Perhitungan Leaderboard tetap Client-Side karena ringan
+// Computed Properties
+const totalPointsInSystem = computed(() => {
+  return allUsers.value.reduce((total, user) => total + (user.points > 0 ? user.points : 0), 0)
+})
+
 const filteredUsers = computed(() => {
   let users = [...allUsers.value].sort((a, b) => b.points - a.points).filter(u => u.points >= 0)
   if (searchQuery.value && activeTab.value === 'Leaderboard') {
@@ -454,61 +486,31 @@ const maxLeaderboardPoints = computed(() => {
 
 const paginatedUsers = computed(() => filteredUsers.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
 
-// Total Halaman Berubah Sesuai Tab yang Aktif
 const currentTotalPages = computed(() => {
-  if (activeTab.value === 'Leaderboard') {
-    return Math.ceil(filteredUsers.value.length / itemsPerPage) || 1
-  }
+  if (activeTab.value === 'Leaderboard') return Math.ceil(filteredUsers.value.length / itemsPerPage) || 1
   return Math.ceil(totalLogs.value / itemsPerPage) || 1
 })
 
 const nextPage = () => { if (currentPage.value < currentTotalPages.value) currentPage.value++ }
 const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
-
 </script>
 
 <style scoped>
-.animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+.animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 @keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(15px); }
+  0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-.fade-enter-active .bg-\[\#111\] { animation: scaleIn 0.2s ease-out forwards; }
+.fade-enter-active .bg-\[\#111\] { animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
 @keyframes scaleIn {
   0% { transform: scale(0.95); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
-
-.bounce-enter-active { animation: slideInUp 0.3s ease-out; }
-.bounce-leave-active { animation: fadeOutDown 0.2s ease-in forwards; }
-
-@keyframes slideInUp {
-  0% { transform: translate(-50%, 100%); opacity: 0; }
-  100% { transform: translate(-50%, 0); opacity: 1; }
-}
-@keyframes fadeOutDown {
-  0% { transform: translate(-50%, 0); opacity: 1; }
-  100% { transform: translate(-50%, 100%); opacity: 0; }
-}
-
-.custom-date-input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.6;
-  cursor: pointer;
-}
-.custom-date-input::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.custom-date-input::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
