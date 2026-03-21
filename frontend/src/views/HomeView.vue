@@ -26,7 +26,7 @@
           </button>
 
           <button @click="$router.push('/login')" class="hidden md:block text-sm font-bold text-gray-300 hover:text-white transition-colors">
-            Admin Login
+            Masuk / Login
           </button>
           
           <button @click="$router.push('/register')" class="text-[10px] md:text-sm font-extrabold bg-gradient-to-r from-ag-purple to-[#5b1d66] text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full hover:shadow-[0_0_20px_rgba(124,40,137,0.5)] transform hover:scale-105 transition-all whitespace-nowrap">
@@ -51,9 +51,10 @@
           
           <button @click="handleMobileContact" class="text-gray-300 hover:text-ag-purple font-bold text-lg transition-colors tracking-wide">Kontak</button>
           <div class="w-1/3 h-px bg-white/10 my-1"></div>
+          
           <button @click="navigateMobile('/login')" class="text-gray-400 hover:text-white font-bold text-sm transition-colors flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
-            Admin Login
+            Masuk / Login
           </button>
         </div>
       </transition>
@@ -108,7 +109,7 @@
             <ul class="space-y-3 text-xs md:text-sm font-medium text-gray-400">
               <li><button @click="$router.push('/')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Beranda</button></li>
               <li><button @click="$router.push('/register')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Pendaftaran Jemaat</button></li>
-              <li><button @click="$router.push('/login')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Login Admin / Staff</button></li>
+              <li><button @click="$router.push('/login')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Login Jemaat & Admin</button></li>
             </ul>
           </div>
           <div>
