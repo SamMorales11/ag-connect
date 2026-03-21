@@ -30,31 +30,21 @@
         <div class="flex flex-col gap-5 border-b border-white/10 pb-6 mb-8">
           <div class="w-full overflow-x-auto pb-2 -mb-2 hide-scrollbar relative">
             <div class="flex items-center gap-2 w-max pr-4">
-              <button @click="activeTab = 'Ringkasan'" :class="activeTab === 'Ringkasan' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
+              <button @click="activeTab = 'Ringkasan'" :class="activeTab === 'Ringkasan' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                 Ringkasan Analitik
               </button>
 
-              <button @click="activeTab = 'Leaderboard'" :class="activeTab === 'Leaderboard' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
+              <button @click="activeTab = 'Leaderboard'" :class="activeTab === 'Leaderboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
                 Klasemen Poin
               </button>
               
-              <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                AG
-              </button>
-              <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                AG Lite
-              </button>
-              <button @click="activeTab = 'Doa Fajar'" :class="activeTab === 'Doa Fajar' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                Doa Fajar
-              </button>
-              <button @click="activeTab = 'Doa Pengerja'" :class="activeTab === 'Doa Pengerja' ? 'bg-orange-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                Doa Pengerja
-              </button>
-              <button @click="activeTab = 'AGC/Fellowship'" :class="activeTab === 'AGC/Fellowship' ? 'bg-pink-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">
-                AGC / Fellowship
-              </button>
+              <button @click="activeTab = 'AG'" :class="activeTab === 'AG' ? 'bg-ag-purple text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">AG</button>
+              <button @click="activeTab = 'AG Lite'" :class="activeTab === 'AG Lite' ? 'bg-ag-yellow text-gray-900 shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">AG Lite</button>
+              <button @click="activeTab = 'Doa Fajar'" :class="activeTab === 'Doa Fajar' ? 'bg-blue-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">Doa Fajar</button>
+              <button @click="activeTab = 'Doa Pengerja'" :class="activeTab === 'Doa Pengerja' ? 'bg-orange-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">Doa Pengerja</button>
+              <button @click="activeTab = 'AGC/Fellowship'" :class="activeTab === 'AGC/Fellowship' ? 'bg-pink-500 text-white shadow-lg' : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'" class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all border border-transparent whitespace-nowrap">AGC / Fellowship</button>
             </div>
           </div>
 
@@ -81,27 +71,67 @@
         </div>
 
         <div v-if="activeTab === 'Ringkasan'" class="animate-fade-in-up space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
-              <p class="text-gray-400 text-sm font-semibold uppercase tracking-widest mb-1">Total Jemaat Terdaftar</p>
-              <h3 class="text-4xl font-black text-white">{{ allUsers.length }}</h3>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md relative overflow-hidden group hover:border-white/20 transition-colors">
+              <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+              <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Total Jemaat</p>
+              <h3 class="text-3xl font-black text-white relative z-10">{{ allUsers.length }}</h3>
             </div>
-            <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-md">
-              <p class="text-blue-400 text-sm font-semibold uppercase tracking-widest mb-1">Total Poin Beredar</p>
-              <h3 class="text-4xl font-black text-blue-300">{{ totalPointsInSystem }} <span class="text-lg font-medium text-blue-500/50">pts</span></h3>
+            
+            <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-5 backdrop-blur-md relative overflow-hidden group hover:border-blue-500/40 transition-colors">
+              <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><svg class="w-12 h-12 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+              <p class="text-blue-400 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Total Poin Beredar</p>
+              <h3 class="text-3xl font-black text-blue-300 relative z-10">{{ totalPointsInSystem }}</h3>
+            </div>
+
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5 backdrop-blur-md relative overflow-hidden group hover:border-emerald-500/40 transition-colors">
+              <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><svg class="w-12 h-12 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+              <p class="text-emerald-400 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Rata-Rata Poin</p>
+              <h3 class="text-3xl font-black text-emerald-300 relative z-10">{{ averagePoints }}</h3>
+            </div>
+
+            <div class="bg-orange-500/10 border border-orange-500/20 rounded-2xl p-5 backdrop-blur-md relative overflow-hidden group hover:border-orange-500/40 transition-colors">
+              <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform"><svg class="w-12 h-12 text-orange-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>
+              <p class="text-orange-400 text-xs font-bold uppercase tracking-widest mb-1 relative z-10">Poin Tertinggi</p>
+              <h3 class="text-3xl font-black text-orange-300 relative z-10">{{ maxLeaderboardPoints }}</h3>
             </div>
           </div>
 
-          <div class="bg-[#111] border border-white/10 rounded-2xl p-6 shadow-2xl relative">
-            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+          <div class="bg-[#111] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
               <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-              Grafik Kehadiran Jemaat (30 Hari Terakhir)
+              Tren Kehadiran Bulanan
             </h3>
-            
             <div class="h-[300px] w-full">
-              <apexchart type="area" height="100%" :options="chartOptions" :series="chartSeries"></apexchart>
+              <apexchart type="area" height="100%" :options="chartOptionsArea" :series="chartSeriesArea"></apexchart>
             </div>
           </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <div class="bg-[#111] border border-white/10 rounded-2xl p-6 shadow-2xl relative flex flex-col">
+              <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                Demografi Jemaat Berdasarkan Status
+              </h3>
+              <div class="flex-grow flex items-center justify-center py-4">
+                <apexchart type="donut" width="100%" :options="chartOptionsDonut" :series="chartSeriesDonut"></apexchart>
+              </div>
+            </div>
+
+            <div class="bg-[#111] border border-white/10 rounded-2xl p-6 shadow-2xl relative flex flex-col">
+              <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-ag-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                Top 5 Jemaat Terapresiasi (MVP)
+              </h3>
+              <div class="flex-grow h-[250px]">
+                <apexchart type="bar" height="100%" :options="chartOptionsBar" :series="chartSeriesBar"></apexchart>
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
         <div v-if="activeTab === 'Leaderboard'" class="animate-fade-in-up">
@@ -210,7 +240,7 @@
           </div>
         </div>
 
-        <div v-if="currentTotalPages > 1 && activeTab !== 'Ringkasan'" class="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4 animate-fade-in-up">
+        <div v-if="currentTotalPages > 1 && !['Leaderboard', 'Ringkasan'].includes(activeTab)" class="flex flex-col sm:flex-row justify-between items-center mt-6 px-2 gap-4 animate-fade-in-up">
           <span class="text-sm font-medium text-gray-500">
             Halaman <span class="text-white">{{ currentPage }}</span> dari <span class="text-white">{{ currentTotalPages }}</span>
           </span>
@@ -271,6 +301,27 @@
       </div>
     </transition>
 
+    <transition name="fade">
+      <div v-if="showResetModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="bg-[#111] border border-white/10 p-6 md:p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl transform transition-all">
+          <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-4 text-red-500">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Reset Data Poin</h3>
+          <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+            Tindakan ini akan mengembalikan <strong class="text-red-400">poin seluruh entitas menjadi 0</strong>. Tindakan ini tidak dapat dibatalkan.
+          </p>
+          <div class="flex gap-3">
+            <button @click="showResetModal = false" :disabled="isProcessingApi" class="flex-1 py-2.5 rounded-lg font-bold text-gray-400 bg-white/5 hover:bg-white/10 hover:text-white border border-white/5 transition-colors disabled:opacity-50">Batal</button>
+            <button @click="confirmResetPoints" :disabled="isProcessingApi" class="flex-1 py-2.5 rounded-lg font-bold text-white bg-red-600 hover:bg-red-500 transition-all flex justify-center items-center disabled:opacity-50">
+              <span v-if="isProcessingApi" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              <span v-else>Lanjutkan</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <transition name="bounce">
       <div v-if="showToast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl border backdrop-blur-xl flex items-center gap-3 shadow-2xl"
            :class="toastType === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'">
@@ -300,7 +351,7 @@ const allUsers = ref([])
 const currentLogs = ref([]) 
 const totalLogs = ref(0)    
 
-// Tab Default diubah menjadi Ringkasan
+// Tab Default: Ringkasan Analitik
 const activeTab = ref('Ringkasan') 
 const searchQuery = ref('')
 const selectedDate = ref('') 
@@ -320,37 +371,90 @@ const toastMessage = ref('')
 const toastType = ref('success')
 let toastTimer = null
 
-// --- KONFIGURASI GRAFIK APEXCHARTS ---
-const chartOptions = ref({
-  chart: {
-    type: 'area',
-    background: 'transparent',
-    toolbar: { show: false },
-    fontFamily: 'inherit'
-  },
+
+// ==========================================
+// 📊 KONFIGURASI GRAFIK APEXCHARTS (DINAMIS)
+// ==========================================
+
+// 1. Grafik Area (Tren Bulanan - Dummy Terstruktur)
+const chartOptionsArea = ref({
+  chart: { type: 'area', background: 'transparent', toolbar: { show: false }, fontFamily: 'inherit' },
   theme: { mode: 'dark' },
-  colors: ['#8b5cf6', '#eab308'],
+  colors: ['#7c2889', '#fde021', '#3b82f6', '#f97316'],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 3 },
   xaxis: {
-    categories: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4', 'Minggu 5'], // Label Dummy untuk presentasi
-    axisBorder: { show: false },
-    axisTicks: { show: false }
+    categories: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4', 'Minggu 5'],
+    axisBorder: { show: false }, axisTicks: { show: false },
+    labels: { style: { colors: '#9ca3af' } }
   },
   yaxis: { show: false },
   grid: { borderColor: 'rgba(255,255,255,0.05)', strokeDashArray: 4 },
-  fill: {
-    type: 'gradient',
-    gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] }
-  },
-  legend: { position: 'top', horizontalAlign: 'right' }
+  fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05, stops: [0, 100] } },
+  legend: { position: 'top', horizontalAlign: 'right', labels: { colors: '#fff' } }
+})
+const chartSeriesArea = ref([
+  { name: 'AG', data: [45, 52, 68, 84, 110] },
+  { name: 'AG Lite', data: [20, 35, 41, 60, 85] },
+  { name: 'Doa Fajar', data: [10, 15, 12, 25, 30] },
+  { name: 'Doa Pengerja', data: [5, 8, 10, 15, 20] }
+])
+
+// 2. Grafik Donut (Demografi Status Pekerjaan - Real Data)
+const statusCounts = computed(() => {
+  const counts = {}
+  allUsers.value.forEach(u => {
+    // Karena saat register jemaat mengisi status Pekerjaan (Siswa, Mahasiswa, dll) atau "Pelayan Tuhan"
+    const status = u.status || 'Lainnya'
+    counts[status] = (counts[status] || 0) + 1
+  })
+  return counts
 })
 
-// Data Dummy Grafik (Bisa diganti dinamis dari backend nantinya)
-const chartSeries = ref([
-  { name: 'Ibadah AG', data: [45, 52, 68, 84, 110] },
-  { name: 'AG Lite', data: [20, 35, 41, 60, 85] }
-])
+const chartSeriesDonut = computed(() => Object.values(statusCounts.value))
+const chartOptionsDonut = computed(() => ({
+  labels: Object.keys(statusCounts.value),
+  chart: { background: 'transparent', type: 'donut' },
+  theme: { mode: 'dark' },
+  colors: ['#8b5cf6', '#eab308', '#3b82f6', '#10b981', '#f97316'],
+  stroke: { colors: ['#111'], width: 2 },
+  dataLabels: { enabled: true, dropShadow: { enabled: false } },
+  legend: { position: 'bottom', labels: { colors: '#fff' } },
+  plotOptions: {
+    pie: { donut: { size: '65%', labels: { show: true, name: { color: '#9ca3af' }, value: { color: '#fff', fontSize: '24px', fontWeight: 900 } } } }
+  }
+}))
+
+// 3. Grafik Batang (Top 5 Jemaat MVP - Real Data)
+const top5Users = computed(() => {
+  return [...allUsers.value].sort((a, b) => b.points - a.points).slice(0, 5)
+})
+
+const chartSeriesBar = computed(() => [{
+  name: 'Total Poin',
+  data: top5Users.value.map(u => u.points)
+}])
+
+const chartOptionsBar = computed(() => ({
+  chart: { type: 'bar', background: 'transparent', toolbar: { show: false } },
+  theme: { mode: 'dark' },
+  colors: ['#eab308'],
+  plotOptions: { bar: { borderRadius: 6, horizontal: false, columnWidth: '40%', distributed: true } },
+  dataLabels: { enabled: false },
+  xaxis: { 
+    categories: top5Users.value.map(u => u.fullname.split(' ')[0]), // Ambil nama panggilan
+    labels: { style: { colors: '#9ca3af', fontWeight: 'bold' } },
+    axisBorder: { show: false }, axisTicks: { show: false }
+  },
+  yaxis: { show: false },
+  grid: { show: false },
+  tooltip: { theme: 'dark' }
+}))
+
+
+// ==========================================
+// 🔄 LOGIKA FETCH DATA & LIFECYCLE
+// ==========================================
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
@@ -419,11 +523,14 @@ const displayToast = (msg, type = 'success') => {
   toastTimer = setTimeout(() => { showToast.value = false }, 3000)
 }
 
-// --- LOGIKA MODAL ---
+
+// ==========================================
+// 🛠 LOGIKA TRANSAKSI POIN (MODAL)
+// ==========================================
+
 const openConfirmModal = (user) => { selectedUser.value = user; showConfirmModal.value = true }
 const openRedeemModal = (user) => { selectedUser.value = user; redeemAmount.value = 0; showRedeemModal.value = true }
 
-// Fungsi Tambah Poin Asli
 const confirmGivePoints = async () => {
   if (!selectedUser.value) return
   isProcessingApi.value = true
@@ -442,7 +549,6 @@ const confirmGivePoints = async () => {
   }
 }
 
-// Fungsi TUKAR POIN (Baru)
 const confirmRedeemPoints = async () => {
   if (!selectedUser.value || redeemAmount.value < 1) return
   isProcessingApi.value = true
@@ -453,11 +559,8 @@ const confirmRedeemPoints = async () => {
       { points_to_deduct: redeemAmount.value }, 
       { headers: { Authorization: `Bearer ${token}` } }
     )
-    
-    // Kurangi poin secara visual di Frontend
     selectedUser.value.points -= redeemAmount.value
     displayToast(response.data.message)
-    
   } catch (error) {
     displayToast(error.response?.data?.detail || "Gagal memotong poin.", 'error')
   } finally {
@@ -465,9 +568,39 @@ const confirmRedeemPoints = async () => {
   }
 }
 
-// Computed Properties
+const confirmResetPoints = async () => {
+  isProcessingApi.value = true
+  try {
+    const token = localStorage.getItem('access_token')
+    const response = await axios.put('https://semskii1-ag-connect-api.hf.space/users/reset-points', {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    allUsers.value.forEach(u => u.points = 0)
+    displayToast(response.data.message)
+  } catch (error) {
+    displayToast(error.response?.data?.detail || "Gagal mereset data.", 'error')
+  } finally {
+    isProcessingApi.value = false; showResetModal.value = false
+  }
+}
+
+
+// ==========================================
+// 🧮 COMPUTED PROPERTIES (KPI)
+// ==========================================
+
 const totalPointsInSystem = computed(() => {
   return allUsers.value.reduce((total, user) => total + (user.points > 0 ? user.points : 0), 0)
+})
+
+const averagePoints = computed(() => {
+  if (allUsers.value.length === 0) return 0;
+  return Math.round(totalPointsInSystem.value / allUsers.value.length)
+})
+
+const maxLeaderboardPoints = computed(() => {
+  if (allUsers.value.length === 0) return 0;
+  return Math.max(...allUsers.value.map(u => u.points), 0)
 })
 
 const filteredUsers = computed(() => {
@@ -477,11 +610,6 @@ const filteredUsers = computed(() => {
     users = users.filter(u => u.fullname.toLowerCase().includes(q) || u.username.toLowerCase().includes(q))
   }
   return users
-})
-
-const maxLeaderboardPoints = computed(() => {
-  if (filteredUsers.value.length === 0) return 1;
-  return Math.max(filteredUsers.value[0].points, 1);
 })
 
 const paginatedUsers = computed(() => filteredUsers.value.slice((currentPage.value - 1) * itemsPerPage, currentPage.value * itemsPerPage))
