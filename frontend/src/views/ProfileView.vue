@@ -214,14 +214,70 @@
 
       </div>
 
-      <div class="flex justify-center mb-10">
-        <button @click="logout" class="flex items-center gap-3 px-8 py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/50 rounded-2xl font-bold transition-all duration-300">
+      <div class="flex flex-wrap justify-center gap-4 mb-10">
+        <button @click="showPasswordModal = true" class="flex items-center gap-3 px-8 py-3.5 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-700 rounded-2xl font-bold transition-all duration-300 shadow-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Ubah Password
+        </button>
+
+        <button @click="logout" class="flex items-center gap-3 px-8 py-3.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/50 rounded-2xl font-bold transition-all duration-300 shadow-lg">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
           Akhiri Sesi & Keluar
         </button>
       </div>
 
     </div>
+
+    <transition name="fade">
+      <div v-if="showPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in-up">
+        <div class="bg-[#111] border border-white/10 p-6 md:p-8 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.8)] w-full max-w-sm relative">
+          
+          <button @click="closePasswordModal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-500/10 border border-blue-500/30 text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <h3 class="text-xl font-black text-white tracking-tight">Ubah Password</h3>
+            <p class="text-xs text-gray-400 mt-2">Buat password baru yang aman untuk melindungi akun Anda.</p>
+          </div>
+
+          <div v-if="passwordError" class="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl text-xs text-center font-medium animate-fade-in-up">
+            {{ passwordError }}
+          </div>
+          <div v-if="passwordSuccess" class="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-xl text-xs text-center font-medium animate-fade-in-up">
+            {{ passwordSuccess }}
+          </div>
+
+          <form @submit.prevent="handleChangePassword" class="space-y-4">
+            
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Password Lama / Bawaan</label>
+              <input v-model="oldPassword" type="password" required class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none text-white text-sm transition-all" placeholder="Masukkan password lama">
+              <p class="text-[10px] text-blue-400 font-medium mt-1.5">*Jemaat baru? Ketik: <strong class="text-white select-all">default_ag_password_123!</strong></p>
+            </div>
+            
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Password Baru</label>
+              <input v-model="newPassword" type="password" required minlength="6" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none text-white text-sm transition-all" placeholder="Minimal 6 karakter">
+            </div>
+            
+            <div>
+              <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Konfirmasi Password Baru</label>
+              <input v-model="confirmPassword" type="password" required minlength="6" class="w-full px-4 py-3 bg-black/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500/50 outline-none text-white text-sm transition-all" placeholder="Ulangi password baru">
+            </div>
+
+            <button type="submit" :disabled="isChangingPassword" class="w-full mt-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-[0_0_15px_rgba(59,130,246,0.4)] flex justify-center items-center disabled:opacity-50 transform hover:scale-[1.02]">
+              <span v-if="isChangingPassword" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+              <span v-else>Simpan Password Baru</span>
+            </button>
+          </form>
+
+        </div>
+      </div>
+    </transition>
 
     <div v-if="showExportModal && user?.is_admin" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in-up">
       <div class="bg-[#111] border border-white/10 p-8 rounded-[2rem] shadow-[0_0_50px_rgba(0,0,0,0.8)] w-full max-w-sm relative text-center">
@@ -268,16 +324,23 @@ const router = useRouter()
 const user = ref(null)
 const isLoading = ref(true)
 
-// State khusus Jemaat
 const myLogs = ref([])
 const isLoadingMyLogs = ref(false)
 const copySuccess = ref(false)
 
-// State Admin
 const showExportModal = ref(false)
 const exportFilter = ref('today')
 const exportServiceType = ref('Semua') 
 const isExporting = ref(false)
+
+// State Modal Ubah Password
+const showPasswordModal = ref(false)
+const oldPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+const passwordError = ref('')
+const passwordSuccess = ref('')
+const isChangingPassword = ref(false)
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
@@ -287,13 +350,11 @@ onMounted(async () => {
   }
 
   try {
-    // 1. Ambil Profil User
     const response = await axios.get('https://semskii1-ag-connect-api.hf.space/users/me', {
       headers: { Authorization: `Bearer ${token}` }
     })
     user.value = response.data
 
-    // 2. Jika bukan Admin, tarik riwayat kehadiran pribadinya! (Trik menggunakan fitur search)
     if (!user.value.is_admin) {
       isLoadingMyLogs.value = true
       try {
@@ -307,15 +368,56 @@ onMounted(async () => {
         isLoadingMyLogs.value = false
       }
     }
-
   } catch (error) {
-    console.error("Gagal mengambil data user", error)
     localStorage.removeItem('access_token')
     router.push('/login')
   } finally {
     isLoading.value = false
   }
 })
+
+// === LOGIKA UBAH PASSWORD ===
+const closePasswordModal = () => {
+  showPasswordModal.value = false
+  oldPassword.value = ''
+  newPassword.value = ''
+  confirmPassword.value = ''
+  passwordError.value = ''
+  passwordSuccess.value = ''
+}
+
+const handleChangePassword = async () => {
+  passwordError.value = ''
+  passwordSuccess.value = ''
+  
+  if (newPassword.value !== confirmPassword.value) {
+    passwordError.value = 'Password baru dan konfirmasi tidak cocok!'
+    return
+  }
+  
+  isChangingPassword.value = true
+  try {
+    const token = localStorage.getItem('access_token')
+    const response = await axios.put('https://semskii1-ag-connect-api.hf.space/users/change-password', {
+      old_password: oldPassword.value,
+      new_password: newPassword.value
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    
+    passwordSuccess.value = response.data.message
+    
+    // Tutup modal otomatis setelah sukses
+    setTimeout(() => {
+      closePasswordModal()
+    }, 2500)
+    
+  } catch (error) {
+    passwordError.value = error.response?.data?.detail || 'Terjadi kesalahan saat menyimpan password.'
+  } finally {
+    isChangingPassword.value = false
+  }
+}
 
 // === LOGIKA GAMIFIKASI (JEMAAT) ===
 const currentTier = computed(() => {
@@ -345,7 +447,6 @@ const copyReferral = () => {
   setTimeout(() => { copySuccess.value = false }, 2000)
 }
 
-// === FUNGSI ADMIN & UMUM ===
 const goToScan = () => router.push('/scan')
 const goToDashboard = () => router.push('/dashboard')
 

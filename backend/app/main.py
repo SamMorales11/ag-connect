@@ -309,3 +309,20 @@ def export_attendances(filter: str = 'all', service_type: str = 'Semua', db: Ses
         
     output_string = '\ufeff' + si.getvalue()
     return Response(content=output_string, media_type="text/csv")
+# --- [FITUR BARU] UBAH PASSWORD ---
+@app.put("/users/change-password")
+def change_password(
+    old_password: str = Body(..., embed=True), 
+    new_password: str = Body(..., embed=True), 
+    db: Session = Depends(get_db), 
+    current_user: models.User = Depends(get_current_user)
+):
+    # Cek apakah password lama yang dimasukkan benar
+    if not verify_password(old_password, current_user.password_hash):
+        raise HTTPException(status_code=400, detail="Password lama salah.")
+    
+    # Update dengan password baru
+    current_user.password_hash = get_password_hash(new_password)
+    db.commit()
+    
+    return {"message": "Password berhasil diperbarui! Akses akun Anda kini lebih aman."}
