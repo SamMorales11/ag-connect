@@ -60,11 +60,11 @@
       </transition>
     </header>
 
-    <main class="relative grow flex items-center justify-center pt-20 md:pt-32 pb-24 overflow-hidden">
+    <main class="relative grow flex items-center justify-center pt-20 md:pt-32 pb-0 overflow-hidden flex-col w-full">
       <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
       <div class="absolute bottom-0 w-full h-64 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none"></div>
 
-      <div class="relative z-20 w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center mt-8 md:mt-0">
+      <div class="relative z-20 w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center mt-8 md:mt-0 flex-grow">
         
         <div class="bg-ag-yellow text-gray-900 font-black text-xs md:text-xl px-3 py-1 md:px-4 md:py-1 tracking-widest uppercase shadow-[0_0_30px_rgba(253,224,33,0.4)] mb-6 md:absolute md:top-1/4 md:right-[15%] md:transform md:rotate-12 md:animate-float z-30">
           Connect & Grow
@@ -87,14 +87,40 @@
           </div>
         </div>
         
-        <p class="mt-10 md:mt-16 text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl font-medium tracking-wide z-20 leading-relaxed px-2">
+        <p class="mt-10 md:mt-16 text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl font-medium tracking-wide z-20 leading-relaxed px-2 mb-16">
           Pusat layanan digital terintegrasi untuk mengelola data jemaat, mencatat kehadiran ibadah secara <span class="italic text-gray-300">real-time</span>, dan mendukung setiap langkah pelayanan Arrow Generation.
         </p>
       </div>
+
+      <div class="w-full overflow-hidden bg-[#0F0F13] border-y border-white/10 py-5 mt-auto relative z-30 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+        
+        <div class="absolute inset-0 bg-gradient-to-r from-ag-purple/10 via-transparent to-ag-yellow/10"></div>
+
+        <div class="flex w-fit animate-marquee hover:[animation-play-state:paused] cursor-default relative z-10">
+          
+          <div class="flex items-center gap-12 pr-12 shrink-0">
+            <div v-for="i in 6" :key="'g1-'+i" class="flex items-center gap-12">
+              <span class="text-white/90 font-black text-xl md:text-2xl tracking-[0.25em] uppercase drop-shadow-md">
+                We Are <span class="text-ag-yellow drop-shadow-[0_0_10px_rgba(253,224,33,0.4)]">Arrow</span> Generation
+              </span>
+              <span class="text-ag-purple font-black text-2xl tracking-widest opacity-80">//</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-12 pr-12 shrink-0">
+            <div v-for="i in 6" :key="'g2-'+i" class="flex items-center gap-12">
+              <span class="text-white/90 font-black text-xl md:text-2xl tracking-[0.25em] uppercase drop-shadow-md">
+                We Are <span class="text-ag-yellow drop-shadow-[0_0_10px_rgba(253,224,33,0.4)]">Arrow</span> Generation
+              </span>
+              <span class="text-ag-purple font-black text-2xl tracking-widest opacity-80">//</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </main>
 
-    <footer id="footer-section" class="relative w-full border-t border-white/5 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 pt-12 md:pt-16 pb-8 mt-auto">
-      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-ag-purple/50 to-transparent"></div>
+    <footer id="footer-section" class="relative w-full bg-[#0A0A0A] z-20 pt-12 md:pt-16 pb-8">
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 mb-12">
           <div class="col-span-1 sm:col-span-2">
@@ -260,5 +286,21 @@ const handleUsherLogin = async () => {
 .slide-down-enter-from, .slide-down-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* KUNCI KEBERHASILAN MARQUEE YANG SEAMLESS (MULUS) */
+.animate-marquee {
+    animation: marquee 30s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* Menggeser blok tepat sejauh 50% dari total lebar kontainer */
+        /* Karena kita mendeplikat blok 2 kali, 50% artinya kembali ke titik awal tanpa patah */
+        transform: translateX(-50%);
+    }
 }
 </style>

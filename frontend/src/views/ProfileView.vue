@@ -133,6 +133,21 @@
 
       <div v-else class="space-y-6 mb-12">
         
+        <div class="bg-gradient-to-br from-[#13131a] to-[#0A0A0A] border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl group">
+          <div class="absolute top-[-20%] right-[-10%] w-40 h-40 bg-ag-yellow/10 rounded-full blur-3xl group-hover:bg-ag-yellow/20 transition-all duration-700"></div>
+          <div class="absolute bottom-[-20%] left-[-10%] w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all duration-700"></div>
+          
+          <div class="relative z-10 flex flex-col items-center text-center">
+            <svg class="w-8 h-8 text-ag-yellow/40 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+            <p class="text-base md:text-lg font-medium text-gray-200 italic leading-relaxed mb-4 max-w-2xl px-4">
+              "{{ dailyVerse.text }}"
+            </p>
+            <span class="inline-block px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-[10px] md:text-xs font-bold text-ag-yellow tracking-widest uppercase shadow-sm">
+              {{ dailyVerse.reference }}
+            </span>
+          </div>
+        </div>
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-[#111]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 relative overflow-hidden shadow-lg group">
             <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all"></div>
@@ -341,6 +356,21 @@ const confirmPassword = ref('')
 const passwordError = ref('')
 const passwordSuccess = ref('')
 const isChangingPassword = ref(false)
+
+// Kumpulan Ayat Alkitab untuk Fitur Acak
+const bibleVerses = [
+  { text: "Sebab Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu, demikianlah firman TUHAN, yaitu rancangan damai sejahtera dan bukan rancangan kecelakaan, untuk memberikan kepadamu hari depan yang penuh harapan.", reference: "Yeremia 29:11" },
+  { text: "Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku.", reference: "Filipi 4:13" },
+  { text: "Janganlah hendaknya kamu kuatir tentang apa pun juga, tetapi nyatakanlah dalam segala hal keinginanmu kepada Allah dalam doa dan permohonan dengan ucapan syukur.", reference: "Filipi 4:6" },
+  { text: "Pencuri datang hanya untuk mencuri dan membunuh dan membinasakan; Aku datang, supaya mereka mempunyai hidup, dan mempunyainya dalam segala kelimpahan.", reference: "Yohanes 10:10" },
+  { text: "Percayalah kepada TUHAN dengan segenap hatimu, dan janganlah bersandar kepada pengertianmu sendiri.", reference: "Amsal 3:5" },
+  { text: "Pencobaan-pencobaan yang kamu alami ialah pencobaan-pencobaan biasa, yang tidak melebihi kekuatan manusia. Sebab Allah setia dan karena itu Ia tidak akan membiarkan kamu dicobai melampaui kekuatanmu.", reference: "1 Korintus 10:13" },
+  { text: "Karena masa depan sungguh ada, dan harapanmu tidak akan hilang.", reference: "Amsal 23:18" },
+  { text: "Sebab itu janganlah kamu kuatir akan hari besok, karena hari besok mempunyai kesusahannya sendiri. Kesusahan sehari cukuplah untuk sehari.", reference: "Matius 6:34" }
+]
+
+// Pilih satu ayat secara acak saat komponen dimuat
+const dailyVerse = ref(bibleVerses[Math.floor(Math.random() * bibleVerses.length)])
 
 onMounted(async () => {
   const token = localStorage.getItem('access_token')
