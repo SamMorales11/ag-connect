@@ -8,15 +8,18 @@
           <img src="/src/assets/LOGO%20AG%20.png" alt="AG Logo" class="h-7 md:h-15 object-contain drop-shadow-[0_0_15px_rgba(124,40,137,0.5)]" />
         </div>
         
-        <nav class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10 text-sm font-bold text-gray-300 tracking-wide">
-          <button @click="$router.push('/')" class="text-white hover:text-ag-yellow transition-colors">Home</button>
+        <nav class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center gap-10 text-[13px] font-black text-gray-300 tracking-[0.15em] uppercase">
+          <button @click="$router.push('/')" class="text-white hover:text-ag-yellow transition-colors duration-300">
+            Beranda
+          </button>
           
-          <button @click="$router.push('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)] hover:scale-105">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+          <button @click="$router.push('/leaderboard')" class="hover:text-ag-yellow transition-colors duration-300">
             Klasemen
           </button>
           
-          <button @click="scrollToFooter" class="hover:text-ag-purple transition-colors">Kontak</button>
+          <button @click="scrollToFooter" class="hover:text-ag-yellow transition-colors duration-300">
+            Kontak
+          </button>
         </nav>
 
         <div class="flex items-center gap-2 md:gap-5">
@@ -41,18 +44,22 @@
       </div>
 
       <transition name="slide-down">
-        <div v-if="isMobileMenuOpen" class="md:hidden absolute top-full left-0 w-full bg-[#0A0A0A]/95 backdrop-blur-2xl border-b border-white/10 flex flex-col items-center py-6 gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.8)] z-50">
-          <button @click="navigateMobile('/')" class="text-white hover:text-ag-yellow font-bold text-lg transition-colors tracking-wide">Home</button>
+        <div v-if="isMobileMenuOpen" class="md:hidden absolute top-full left-0 w-full bg-[#0A0A0A]/95 backdrop-blur-2xl border-b border-white/10 flex flex-col items-center py-8 gap-8 shadow-[0_20px_40px_rgba(0,0,0,0.8)] z-50 uppercase tracking-[0.2em] font-black text-sm">
+          <button @click="navigateMobile('/')" class="text-white hover:text-ag-yellow transition-colors">
+            Beranda
+          </button>
           
-          <button @click="navigateMobile('/leaderboard')" class="text-emerald-400 hover:text-ag-yellow font-black text-lg transition-all flex items-center gap-2 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+          <button @click="navigateMobile('/leaderboard')" class="text-gray-300 hover:text-ag-yellow transition-colors">
             Klasemen
           </button>
           
-          <button @click="handleMobileContact" class="text-gray-300 hover:text-ag-purple font-bold text-lg transition-colors tracking-wide">Kontak</button>
-          <div class="w-1/3 h-px bg-white/10 my-1"></div>
+          <button @click="handleMobileContact" class="text-gray-300 hover:text-ag-yellow transition-colors">
+            Kontak
+          </button>
           
-          <button @click="navigateMobile('/login')" class="text-gray-400 hover:text-white font-bold text-sm transition-colors flex items-center gap-2">
+          <div class="w-1/3 h-px bg-white/10 my-2"></div>
+          
+          <button @click="navigateMobile('/login')" class="text-gray-400 hover:text-white transition-colors tracking-widest uppercase flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
             Masuk / Login
           </button>
@@ -97,7 +104,6 @@
         <div class="absolute inset-0 bg-gradient-to-r from-ag-purple/10 via-transparent to-ag-yellow/10"></div>
 
         <div class="flex w-fit animate-marquee hover:[animation-play-state:paused] cursor-default relative z-10">
-          
           <div class="flex items-center gap-12 pr-12 shrink-0">
             <div v-for="i in 6" :key="'g1-'+i" class="flex items-center gap-12">
               <span class="text-white/90 font-black text-xl md:text-2xl tracking-[0.25em] uppercase drop-shadow-md">
@@ -115,40 +121,66 @@
               <span class="text-ag-purple font-black text-2xl tracking-widest opacity-80">//</span>
             </div>
           </div>
-
         </div>
       </div>
     </main>
 
-    <footer id="footer-section" class="relative w-full bg-[#0A0A0A] z-20 pt-12 md:pt-16 pb-8">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 mb-12">
-          <div class="col-span-1 sm:col-span-2">
-            <div class="flex items-center gap-3 mb-5">
-              <img src="/src/assets/LOGO%20AG%20.png" alt="AG Logo" class="h-8 object-contain" />
-              <span class="text-xl font-black text-white tracking-widest uppercase">AG <span class="text-ag-purple">Connect</span></span>
+    <footer id="footer-section" class="w-full bg-[#050505] pt-16 pb-8 border-t border-white/5 relative z-20">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8 mb-16">
+          <div class="md:col-span-5">
+            <div class="flex items-center gap-3 mb-6">
+              <img src="/src/assets/LOGO%20AG%20.png" alt="AG Logo" class="h-7 object-contain opacity-90" />
+              <span class="text-lg font-black text-white tracking-[0.2em] uppercase">AG <span class="text-ag-purple">Connect</span></span>
             </div>
-            <p class="text-gray-400 text-xs md:text-sm leading-relaxed max-w-md font-medium">Sebuah inovasi sistem manajemen jemaat modern untuk mengoptimalkan pendaftaran, pencatatan absensi, dan pengelolaan data pelayanan secara aman, cepat, dan presisi.</p>
+            <p class="text-gray-500 text-xs md:text-[13px] leading-relaxed max-w-sm font-medium">
+              Sistem manajemen jemaat terintegrasi untuk mengoptimalkan pendaftaran, pencatatan absensi, dan pengelolaan data pelayanan secara presisi dan efisien.
+            </p>
           </div>
-          <div>
-            <h4 class="text-white font-extrabold mb-4 uppercase tracking-widest text-xs">Navigasi Utama</h4>
-            <ul class="space-y-3 text-xs md:text-sm font-medium text-gray-400">
-              <li><button @click="$router.push('/')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Beranda</button></li>
-              <li><button @click="$router.push('/register')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Pendaftaran Jemaat</button></li>
-              <li><button @click="$router.push('/login')" class="hover:text-ag-yellow transition-colors flex items-center gap-2"><span class="text-ag-purple">▸</span> Login Jemaat & Admin</button></li>
+
+          <div class="hidden md:block md:col-span-1"></div>
+
+          <div class="md:col-span-3">
+            <h4 class="text-gray-400 font-bold mb-6 uppercase tracking-[0.15em] text-[10px]">Navigasi Utama</h4>
+            <ul class="space-y-4 text-sm font-medium text-gray-500">
+              <li>
+                <button @click="$router.push('/')" class="hover:text-white transition-colors duration-300 flex items-center gap-3 group">
+                  <span class="text-ag-purple/50 group-hover:text-ag-purple transition-colors text-xs">▸</span> Beranda
+                </button>
+              </li>
+              <li>
+                <button @click="$router.push('/register')" class="hover:text-white transition-colors duration-300 flex items-center gap-3 group">
+                  <span class="text-ag-purple/50 group-hover:text-ag-purple transition-colors text-xs">▸</span> Pendaftaran Jemaat
+                </button>
+              </li>
+              <li>
+                <button @click="$router.push('/login')" class="hover:text-white transition-colors duration-300 flex items-center gap-3 group">
+                  <span class="text-ag-purple/50 group-hover:text-ag-purple transition-colors text-xs">▸</span> Login Portal
+                </button>
+              </li>
             </ul>
           </div>
-          <div>
-            <h4 class="text-white font-extrabold mb-4 uppercase tracking-widest text-xs">Hubungi Kami</h4>
-            <ul class="space-y-3 text-xs md:text-sm font-medium text-gray-400">
-              <li class="flex items-start gap-3"><svg class="w-4 h-4 md:w-5 md:h-5 text-ag-yellow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>Balikpapan, Kalimantan Timur</span></li>
-              <li class="flex items-center gap-3"><svg class="w-4 h-4 md:w-5 md:h-5 text-ag-purple shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><span>arrowgenerationbfog</span></li>
+
+          <div class="md:col-span-3">
+            <h4 class="text-gray-400 font-bold mb-6 uppercase tracking-[0.15em] text-[10px]">Hubungi Kami</h4>
+            <ul class="space-y-4 text-sm font-medium text-gray-500">
+              <li class="flex items-start gap-3 group cursor-default">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-ag-yellow transition-colors shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="group-hover:text-gray-300 transition-colors leading-tight">Balikpapan, Kalimantan Timur</span>
+              </li>
+              <li class="flex items-center gap-3 group cursor-default">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-ag-purple transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <span class="group-hover:text-gray-300 transition-colors">@arrowgenerationbfog</span>
+              </li>
             </ul>
           </div>
         </div>
-        <div class="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p class="text-gray-600 text-[10px] md:text-xs text-center md:text-left font-medium tracking-wide">&copy; 2026 Arrow Generation Connect. All rights reserved.</p>
+        
+        <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-gray-600 text-[11px] font-medium tracking-wide">© 2026 Arrow Generation Connect. All rights reserved.</p>
         </div>
+
       </div>
     </footer>
 
@@ -288,7 +320,6 @@ const handleUsherLogin = async () => {
   transform: translateY(-10px);
 }
 
-/* KUNCI KEBERHASILAN MARQUEE YANG SEAMLESS (MULUS) */
 .animate-marquee {
     animation: marquee 30s linear infinite;
 }
@@ -298,8 +329,6 @@ const handleUsherLogin = async () => {
         transform: translateX(0);
     }
     100% {
-        /* Menggeser blok tepat sejauh 50% dari total lebar kontainer */
-        /* Karena kita mendeplikat blok 2 kali, 50% artinya kembali ke titik awal tanpa patah */
         transform: translateX(-50%);
     }
 }
