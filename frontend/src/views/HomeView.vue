@@ -67,36 +67,35 @@
       </transition>
     </header>
 
-    <main class="relative grow flex items-center justify-center pt-20 md:pt-32 pb-0 overflow-hidden flex-col w-full">
+    <main class="relative grow flex items-center justify-center pt-24 md:pt-28 pb-0 overflow-hidden flex-col w-full">
       <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
       <div class="absolute bottom-0 w-full h-64 bg-gradient-to-t from-[#0A0A0A] to-transparent z-10 pointer-events-none"></div>
 
-      <div class="relative z-20 w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center mt-8 md:mt-0 flex-grow">
+      <div class="relative z-20 w-full max-w-7xl mx-auto px-4 md:px-6 flex flex-col items-center justify-center text-center mt-2 md:mt-4 flex-grow">
         
-        <div class="bg-ag-yellow text-gray-900 font-black text-xs md:text-xl px-3 py-1 md:px-4 md:py-1 tracking-widest uppercase shadow-[0_0_30px_rgba(253,224,33,0.4)] mb-6 md:absolute md:top-1/4 md:right-[15%] md:transform md:rotate-12 md:animate-float z-30">
-          Connect & Grow
+        <div class="mb-8 md:mb-12 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl z-30 animate-fade-in-up">
+          <span class="w-2 h-2 rounded-full bg-ag-yellow animate-pulse shadow-[0_0_10px_rgba(253,224,33,0.8)]"></span>
+          <span class="text-[10px] md:text-xs font-bold text-gray-300 tracking-[0.2em] uppercase">Sistem Manajemen Jemaat <span class="text-ag-purple px-1 md:px-2">•</span> Connect & Grow</span>
         </div>
 
-        <div class="relative flex flex-col items-center justify-center w-full">
+        <div class="relative flex flex-col items-center justify-center w-full animate-fade-in-up" style="animation-delay: 0.1s;">
           <h1 class="text-5xl sm:text-7xl md:text-[10vw] font-black uppercase leading-[0.85] md:leading-[0.8] tracking-tighter text-white drop-shadow-2xl flex flex-col items-center w-full">
-            <span class="block text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 transform hover:scale-105 transition duration-500">Welcome</span>
+            
+            <span class="block text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-300 transform hover:scale-105 transition duration-500">Welcome</span>
             
             <span class="flex items-center justify-center w-full my-2 md:my-0">
               <span class="text-sm sm:text-2xl md:text-[2.5vw] text-ag-purple transform -rotate-90 origin-center mr-2 md:mr-6 tracking-normal">TO</span>
               <span class="text-transparent bg-clip-text bg-gradient-to-r from-ag-yellow to-[#e5c910] drop-shadow-[0_0_20px_rgba(253,224,33,0.2)]">Arrow</span>
             </span>
             
-            <span class="block text-transparent bg-clip-text bg-gradient-to-b from-gray-200 to-gray-700">Generation</span>
+            <span class="block text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-300">Generation</span>
           </h1>
-          
-          <div class="mt-6 md:mt-0 md:absolute md:bottom-[5%] md:right-[-2%] bg-ag-purple text-white px-4 py-2 text-[10px] md:text-sm font-bold tracking-widest uppercase z-30 shadow-xl border border-white/20 backdrop-blur-sm rounded-lg md:rounded-none">
-            Sistem Manajemen Jemaat
-          </div>
         </div>
         
-        <p class="mt-10 md:mt-16 text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl font-medium tracking-wide z-20 leading-relaxed px-2 mb-16">
+        <p class="mt-10 md:mt-16 text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl font-medium tracking-wide z-20 leading-relaxed px-2 mb-16 animate-fade-in-up" style="animation-delay: 0.2s;">
           Pusat layanan digital terintegrasi untuk mengelola data jemaat, mencatat kehadiran ibadah secara <span class="italic text-gray-300">real-time</span>, dan mendukung setiap langkah pelayanan Arrow Generation.
         </p>
+
       </div>
 
       <div class="w-full overflow-hidden bg-[#0F0F13] border-y border-white/10 py-5 mt-auto relative z-30 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
