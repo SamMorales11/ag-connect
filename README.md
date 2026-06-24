@@ -57,7 +57,6 @@ Sistem *generate* laporan kehadiran matriks otomatis yang langsung diformat seca
 ## 🚀 Cara Menjalankan Proyek Secara Lokal (Local Setup)
 
 ### 1. Menjalankan Backend (FastAPI)
-Pastikan Anda sudah menginstal Python 3.8+.
 ```bash
 # Clone repository ini
 git clone [https://github.com/username-anda/ag-connect.git](https://github.com/username-anda/ag-connect.git)
