@@ -54,22 +54,6 @@ Sistem *generate* laporan kehadiran matriks otomatis yang langsung diformat seca
 * **Frontend:** Vercel
 * **Backend / API:** Hugging Face Spaces
 
----
-
-## 📸 Cuplikan Layar (Screenshots)
-
-*(Ganti URL gambar di bawah ini dengan screenshot aplikasi Anda yang sebenarnya)*
-
-| Halaman Utama (Landing Page) | Dashboard Analitik (Admin) |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/600x300/0A0A0A/FFFFFF?text=Landing+Page+Screenshot" alt="Landing Page"> | <img src="https://via.placeholder.com/600x300/111111/FFFFFF?text=Analytics+Dashboard" alt="Analytics Dashboard"> |
-
-| Portal Pribadi (Jemaat) | Kartu ID Digital |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/600x300/111111/FFFFFF?text=Self-Service+Portal" alt="Member Portal"> | <img src="https://via.placeholder.com/300x400/1E1030/FFFFFF?text=QR+Digital+Card" alt="ID Card"> |
-
----
-
 ## 🚀 Cara Menjalankan Proyek Secara Lokal (Local Setup)
 
 ### 1. Menjalankan Backend (FastAPI)
