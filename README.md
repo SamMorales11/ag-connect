@@ -1,4 +1,4 @@
-# ⛪ AG Connect - Next-Generation Church Management System
+# ⛪ AG Connect - Next Generation Church Management System
 
 ![Vue.js](https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
@@ -60,13 +60,18 @@ Sistem *generate* laporan kehadiran matriks otomatis yang langsung diformat seca
 ```bash
 # Clone repository ini
 git clone [https://github.com/username-anda/ag-connect.git](https://github.com/username-anda/ag-connect.git)
+```
 
-# Masuk ke folder backend
+### 2. Masuk ke folder backend
+```bash
 cd ag-connect/backend
+```
 
-# Buat virtual environment (opsional tapi disarankan)
+### 3. Buat virtual environment (opsional tapi disarankan)
+```bash
 python -m venv venv
 source venv/bin/activate  # Untuk Windows: venv\Scripts\activate
+```
 
 # Install dependencies
 pip install -r requirements.txt
