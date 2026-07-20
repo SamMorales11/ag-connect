@@ -73,15 +73,21 @@ python -m venv venv
 source venv/bin/activate  # Untuk Windows: venv\Scripts\activate
 ```
 
-# Install dependencies
+### 4. Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
-# Jalankan server FastAPI
+### 5. Jalankan server FastAPI
+```bash
 uvicorn main:app --reload
+```
 
 Menjalankan Frontend (Vue.js)
-# Buka terminal baru, masuk ke folder frontend
+### 6.  Buka terminal baru, masuk ke folder frontend
+```bash
 cd ag-connect/frontend
+```
 
 # Install dependencies
 npm install
