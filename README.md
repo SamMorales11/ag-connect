@@ -89,8 +89,12 @@ Menjalankan Frontend (Vue.js)
 cd ag-connect/frontend
 ```
 
-# Install dependencies
+### 7. Install dependencies
+```bash
 npm install
+```
 
-# Jalankan server development Vue
+### 8. Jalankan server development Vue
+```bash
 npm run dev
+```
